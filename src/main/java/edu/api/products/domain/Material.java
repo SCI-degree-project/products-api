@@ -10,4 +10,4 @@ public enum Material {
     PLASTIC,
     LEATHER,
     SYNTHETIC_LEATHER,
-    }
+}

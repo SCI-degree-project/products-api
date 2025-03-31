@@ -8,7 +8,11 @@ import java.util.UUID;
 
 @Service
 public class ProductService implements IProductService {
-    private IProductRepository productRepository;
+    private final IProductRepository productRepository;
+
+    public ProductService(IProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     @Override
     public void create(Product product) {
