@@ -1,8 +1,9 @@
 package edu.api.products.application.controllers;
 
-import edu.api.products.application.dto.CreateProductDTO;
+import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.services.ProductService;
-import edu.api.products.domain.Product;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,14 +20,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody CreateProductDTO productDTO) {
-        Product product = Product.builder()
-                .name(productDTO.getProductName())
-                .description(productDTO.getProductDescription())
-                .price(productDTO.getProductPrice())
-                .materials(productDTO.getMaterial())
-                .build();
-        productService.create(product);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        try {
+            productService.create(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
