@@ -2,6 +2,7 @@ package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
+import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,15 @@ public class ProductController {
         }
     }
 
-    @PutMapping
+    @PutMapping("/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID productId, @RequestBody ProductDTO productDTO) {
-
+        try {
+            productService.update(productId, productDTO);
+            return ResponseEntity.ok().body(productDTO);
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
