@@ -8,7 +8,6 @@ import edu.api.products.domain.Product;
 import edu.api.products.infrastructure.IProductRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -49,9 +48,9 @@ public class ProductService implements IProductService {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found."));
 
-        existingProduct.setName(product.getProductName());
-        existingProduct.setDescription(product.getProductDescription());
-        existingProduct.setPrice(product.getProductPrice());
+        existingProduct.setName(product.productName());
+        existingProduct.setDescription(product.productDescription());
+        existingProduct.setPrice(product.productPrice());
 
         validateProduct(existingProduct);
 
