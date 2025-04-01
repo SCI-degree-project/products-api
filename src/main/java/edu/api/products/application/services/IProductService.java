@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface IProductService {
     void create(ProductDTO product);
     void get(UUID id);
-    void update(ProductDTO product);
+    void update(UUID productId, ProductDTO product);
     void delete(UUID id);
 }

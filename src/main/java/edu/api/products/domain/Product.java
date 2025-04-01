@@ -1,19 +1,17 @@
 package edu.api.products.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@Setter
 @Builder
 @Table(name = "products")
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @AllArgsConstructor
 public class Product {
     @Id
