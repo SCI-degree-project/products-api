@@ -4,6 +4,7 @@ import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
+import edu.api.products.domain.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,18 @@ public class ProductController {
         try {
             productService.create(productDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProduct(@PathVariable UUID productId) {
+        try {
+            Product product = productService.get(productId);
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         }
