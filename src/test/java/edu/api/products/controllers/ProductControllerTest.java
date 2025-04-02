@@ -3,6 +3,7 @@ package edu.api.products.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
+import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
 import edu.api.products.domain.Material;
 import org.junit.jupiter.api.Test;
@@ -14,11 +15,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -31,7 +34,7 @@ public class ProductControllerTest {
     @Mock
     private ProductService productService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void shouldCreateProductSuccessfully() throws Exception {
@@ -56,5 +59,29 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidProductDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestForNullProduct() throws Exception {
+        doThrow(new BusinessException("Product data must not be null."))
+                .when(productService).update(any(UUID.class), any(ProductDTO.class));
+
+        mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(null)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnNotFoundForInvalidProduct() throws Exception {
+        ProductDTO invalidProductDTO = new ProductDTO("Table", "A wooden table", 100.0, List.of(Material.PINE_WOOD));
+
+        doThrow(new ProductNotFoundException("Product not found."))
+                .when(productService).update(any(UUID.class), any(ProductDTO.class));
+
+        mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidProductDTO)))
+                .andExpect(status().isNotFound());
     }
 }
