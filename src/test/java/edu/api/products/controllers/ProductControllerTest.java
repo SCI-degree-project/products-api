@@ -6,6 +6,7 @@ import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
 import edu.api.products.domain.Material;
+import edu.api.products.domain.Product;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -59,6 +59,18 @@ public class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidProductDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnOkForValidProduct() throws Exception {
+        UUID productId = UUID.fromString("5710f7d0-3aa9-4462-b757-adb50ef039db");
+        Product mockProduct = new Product(productId, "Chair", "Wooden chair", 150.0, new ArrayList<>());
+
+        when(productService.get(any(UUID.class))).thenReturn(mockProduct);
+
+        mockMvc.perform(get("/products/" + productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
