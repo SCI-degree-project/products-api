@@ -32,8 +32,13 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void get(UUID id) {
-        productRepository.findById(id);
+    public Product get(UUID id) {
+        if (id == null) {
+            throw new BusinessException("Product ID must not be null.");
+        }
+
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
     }
 
     @Override
