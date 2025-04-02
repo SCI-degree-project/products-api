@@ -21,10 +21,10 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
         try {
-            productService.create(productDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
+            Product product = productService.create(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(product);
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
@@ -65,10 +65,10 @@ public class ProductController {
         try {
             productService.delete(productId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.notFound().build();
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

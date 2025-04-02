@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,9 @@ public class ProductControllerTest {
     @Test
     void shouldCreateProductSuccessfully() throws Exception {
         ProductDTO productDTO = new ProductDTO("Chair", "A wooden chair", 150.0, List.of(Material.BIRCH_WOOD));
+        Product createdProduct = new Product(UUID.randomUUID(), productDTO.name(), productDTO.description(), productDTO.price(), new ArrayList<>());
 
-        doNothing().when(productService).create(any(ProductDTO.class));
+        when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
         mockMvc.perform(post("/products")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +80,9 @@ public class ProductControllerTest {
         doThrow(new BusinessException("Product data must not be null."))
                 .when(productService).update(any(UUID.class), any(ProductDTO.class));
 
-        mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
+        UUID randomProductId = UUID.randomUUID();
+
+        mockMvc.perform(put("/products/" + randomProductId + "0")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
                 .andExpect(status().isBadRequest());
@@ -94,6 +98,38 @@ public class ProductControllerTest {
         mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidProductDTO)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldCreateAndDeleteProduct() throws Exception {
+        ProductDTO productDTO = new ProductDTO("Table", "A wooden Table", 350.0, List.of(Material.BIRCH_WOOD));
+        Product createdProduct = new Product(UUID.randomUUID(), productDTO.name(), productDTO.description(), productDTO.price(), new ArrayList<>());
+
+
+        when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
+
+        MvcResult createResult = mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productDTO)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String responseBody = createResult.getResponse().getContentAsString();
+        Product createdResponse = objectMapper.readValue(responseBody, Product.class);
+        UUID productId = createdResponse.getId();
+
+        when(productService.get(productId)).thenReturn(createdResponse);
+
+        mockMvc.perform(delete("/products/" + productId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldReturnNotFoundForDeleteProduct() throws Exception {
+        UUID productId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+
+        mockMvc.perform(delete("/products/" + productId))
                 .andExpect(status().isNotFound());
     }
 }

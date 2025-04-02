@@ -5,7 +5,7 @@ import edu.api.products.domain.Material;
 import java.util.List;
 
 public record ProductDTO(
-        String productName,
-        String productDescription,
-        double productPrice,
-        List<Material> material) { }
+        String name,
+        String description,
+        double price,
+        List<Material> materials) { }
