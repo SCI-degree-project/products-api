@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -63,7 +64,7 @@ public class ProductControllerTest {
     @Test
     void shouldReturnBadRequestForNullProduct() throws Exception {
         doThrow(new BusinessException("Product data must not be null."))
-                .when(productService).create(any(ProductDTO.class));
+                .when(productService).update(any(UUID.class), any(ProductDTO.class));
 
         mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +77,7 @@ public class ProductControllerTest {
         ProductDTO invalidProductDTO = new ProductDTO("Table", "A wooden table", 100.0, List.of(Material.PINE_WOOD));
 
         doThrow(new ProductNotFoundException("Product not found."))
-                .when(productService).create(any(ProductDTO.class));
+                .when(productService).update(any(UUID.class), any(ProductDTO.class));
 
         mockMvc.perform(put("/products/e7c08bc7-60e0-46fa-8ff0-1fd444afe0eb")
                         .contentType(MediaType.APPLICATION_JSON)
