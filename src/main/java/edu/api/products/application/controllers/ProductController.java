@@ -27,6 +27,8 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.CREATED).body(productDTO);
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -39,6 +41,8 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -51,6 +55,22 @@ public class ProductController {
             return ResponseEntity.badRequest().build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable UUID productId) {
+        try {
+            productService.delete(productId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -64,6 +64,12 @@ public class ProductService implements IProductService {
 
     @Override
     public void delete(UUID id) {
+        if (id == null) {
+            throw new BusinessException("Product ID must not be null.");
+        }
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
+        }
         productRepository.deleteById(id);
     }
 
