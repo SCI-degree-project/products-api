@@ -19,7 +19,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void create(ProductDTO product) {
+    public Product create(ProductDTO product) {
         if (product == null) {
             throw new BusinessException("Product data must not be null.");
         }
@@ -28,7 +28,7 @@ public class ProductService implements IProductService {
 
         validateProduct(newProduct);
 
-        productRepository.save(newProduct);
+        return productRepository.save(newProduct);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void update(UUID productId, ProductDTO product) {
+    public Product update(UUID productId, ProductDTO product) {
         if (productId == null) {
             throw new BusinessException("Product ID must not be null.");
         }
@@ -53,17 +53,23 @@ public class ProductService implements IProductService {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found."));
 
-        existingProduct.setName(product.productName());
-        existingProduct.setDescription(product.productDescription());
-        existingProduct.setPrice(product.productPrice());
+        existingProduct.setName(product.name());
+        existingProduct.setDescription(product.description());
+        existingProduct.setPrice(product.price());
 
         validateProduct(existingProduct);
 
-        productRepository.save(existingProduct);
+        return productRepository.save(existingProduct);
     }
 
     @Override
     public void delete(UUID id) {
+        if (id == null) {
+            throw new BusinessException("Product ID must not be null.");
+        }
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Product with id " + id + " not found.");
+        }
         productRepository.deleteById(id);
     }
 
