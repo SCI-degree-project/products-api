@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface IProductService {
     Product create(ProductDTO product);
-    Product get(UUID id);
-    Product update(UUID productId, ProductDTO product);
-    void delete(UUID id);
+    Product get(UUID tenantId, UUID id);
+    Product update(UUID tenantId, UUID productId, ProductDTO product);
+    void delete(UUID tenantId, UUID id);
 }

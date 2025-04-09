@@ -2,6 +2,7 @@ package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
+import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
 import edu.api.products.domain.Product;
@@ -32,11 +33,13 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<Product> getProduct(@PathVariable UUID productId) {
+    @GetMapping("/{tenantId}/{productId}")
+    public ResponseEntity<Product> getProduct(@PathVariable UUID tenantId, @PathVariable UUID productId) {
         try {
-            Product product = productService.get(productId);
+            Product product = productService.get(tenantId, productId);
             return ResponseEntity.status(HttpStatus.OK).body(product);
+        } catch (InvalidTenantException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (BusinessException e) {
@@ -46,11 +49,13 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID productId, @RequestBody ProductDTO productDTO) {
+    @PutMapping("/{tenantId}/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable UUID tenantId, @PathVariable UUID productId, @RequestBody ProductDTO productDTO) {
         try {
-            productService.update(productId, productDTO);
+            productService.update(tenantId, productId, productDTO);
             return ResponseEntity.ok().body(productDTO);
+        } catch (InvalidTenantException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (ProductNotFoundException e) {
@@ -60,11 +65,13 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable UUID productId) {
+    @DeleteMapping("/{tenantId}/{productId}")
+    public ResponseEntity<String> deleteProduct(@PathVariable UUID tenantId, @PathVariable UUID productId) {
         try {
-            productService.delete(productId);
+            productService.delete(tenantId, productId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (InvalidTenantException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (ProductNotFoundException e) {

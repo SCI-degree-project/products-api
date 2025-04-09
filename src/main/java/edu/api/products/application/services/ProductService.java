@@ -2,6 +2,7 @@ package edu.api.products.application.services;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
+import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.domain.Product;
@@ -20,6 +21,7 @@ public class ProductService implements IProductService {
 
     @Override
     public Product create(ProductDTO product) {
+
         if (product == null) {
             throw new BusinessException("Product data must not be null.");
         }
@@ -32,26 +34,33 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product get(UUID id) {
-        if (id == null) {
-            throw new BusinessException("Product ID must not be null.");
+    public Product get(UUID tenantId, UUID id) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
         }
 
-        return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
+        if (id == null) {
+            throw new BusinessException("Product Id must not be null.");
+        }
+
+        return existProduct(tenantId, id);
     }
 
     @Override
-    public Product update(UUID productId, ProductDTO product) {
-        if (productId == null) {
-            throw new BusinessException("Product ID must not be null.");
+    public Product update(UUID tenantId, UUID productId, ProductDTO product) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
         }
+
+        if (productId == null) {
+            throw new BusinessException("Product Id must not be null.");
+        }
+
         if (product == null) {
             throw new BusinessException("Product data must not be null.");
         }
 
-        Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
+        Product existingProduct = existProduct(tenantId, productId);
 
         existingProduct.setName(product.name());
         existingProduct.setDescription(product.description());
@@ -63,13 +72,17 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void delete(UUID id) {
+    public void delete(UUID tenantId, UUID id) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
+        }
+
         if (id == null) {
             throw new BusinessException("Product ID must not be null.");
         }
-        if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException("Product with id " + id + " not found.");
-        }
+
+        existProduct(tenantId, id);
+
         productRepository.deleteById(id);
     }
 
@@ -82,5 +95,16 @@ public class ProductService implements IProductService {
         if(product.getPrice() <= 0 || product.getPrice() >= MAX_PRICE){
             throw new BusinessException("Unable to create the product. Price out of range.");
         }
+    }
+
+    private Product existProduct(UUID tenantId, UUID productId) {
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
+
+        if(!existingProduct.getTenantId().equals(tenantId)){
+            throw new InvalidTenantException("Invalid tenant Id.");
+        }
+
+        return existingProduct;
     }
 }
