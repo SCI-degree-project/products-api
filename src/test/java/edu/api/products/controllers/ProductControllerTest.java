@@ -3,10 +3,10 @@ package edu.api.products.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
-import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.ProductService;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
+import edu.api.products.domain.Style;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +38,27 @@ public class ProductControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    UUID tenantId = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-abcdef012345");
+
     @Test
     void shouldCreateProductSuccessfully() throws Exception {
-        ProductDTO productDTO = new ProductDTO("Chair", "A wooden chair", 150.0, List.of(Material.BIRCH_WOOD));
-        Product createdProduct = new Product(UUID.randomUUID(), productDTO.name(), productDTO.description(), productDTO.price(), new ArrayList<>());
+        ProductDTO productDTO = new ProductDTO(
+                "Chair",
+                "A wooden chair",
+                150.0,
+                List.of(Material.BIRCH_WOOD),
+                Style.MODERN,
+                tenantId
+        );
+        Product createdProduct = new Product(
+                UUID.randomUUID(),
+                productDTO.name(),
+                productDTO.description(),
+                productDTO.price(),
+                productDTO.materials(),
+                productDTO.style(),
+                productDTO.tenantId()
+        );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
@@ -53,7 +70,14 @@ public class ProductControllerTest {
 
     @Test
     void shouldReturnBadRequestForInvalidPrice() throws Exception {
-        ProductDTO invalidProductDTO = new ProductDTO("Table", "A wooden table", -5.0, List.of(Material.PINE_WOOD));
+        ProductDTO invalidProductDTO = new ProductDTO(
+                "Table",
+                "A wooden table",
+                -50.0,
+                List.of(Material.PINE_WOOD),
+                Style.MODERN,
+                tenantId
+        );
 
         doThrow(new BusinessException("Price out of range"))
                 .when(productService).create(any(ProductDTO.class));
@@ -65,22 +89,25 @@ public class ProductControllerTest {
     }
 
     @Test
-    void shouldReturnOkForValidProduct() throws Exception {
-        UUID productId = UUID.fromString("5710f7d0-3aa9-4462-b757-adb50ef039db");
-        Product mockProduct = new Product(productId, "Chair", "Wooden chair", 150.0, new ArrayList<>());
+    void shouldReturnOkForGetValidProduct() throws Exception {
+        ProductDTO productDTO = new ProductDTO(
+                "Chair",
+                "A wooden chair",
+                150.0,
+                List.of(Material.BIRCH_WOOD),
+                Style.MODERN,
+                tenantId
+        );
 
-        when(productService.get(any(UUID.class))).thenReturn(mockProduct);
-
-        mockMvc.perform(get("/products/" + productId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void shouldCreateAndUpdateAProductSuccessfully() throws Exception {
-        ProductDTO productDTO = new ProductDTO("Bed", "A big bed", 1350.0, List.of(Material.BIRCH_WOOD));
-        Product createdProduct = new Product(UUID.randomUUID(), productDTO.name(), productDTO.description(), productDTO.price(), new ArrayList<>());
-
+        Product createdProduct = new Product(
+                UUID.randomUUID(),
+                productDTO.name(),
+                productDTO.description(),
+                productDTO.price(),
+                productDTO.materials(),
+                productDTO.style(),
+                productDTO.tenantId()
+        );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
@@ -94,11 +121,58 @@ public class ProductControllerTest {
         Product createdResponse = objectMapper.readValue(responseBody, Product.class);
         UUID productId = createdResponse.getId();
 
-        ProductDTO productUpdated = new ProductDTO("Big Bed", "A big bed", 1550.0, List.of(Material.BIRCH_WOOD));
+        when(productService.get(any(UUID.class), any(UUID.class))).thenReturn(createdProduct);
 
-        when(productService.get(productId)).thenReturn(createdResponse);
+        mockMvc.perform(get("/products/" + tenantId + "/" + productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
-        MvcResult updateResult = mockMvc.perform(put("/products/" + productId)
+    @Test
+    void shouldCreateAndUpdateAProductSuccessfully() throws Exception {
+        ProductDTO productDTO = new ProductDTO(
+                "Bed",
+                "A big bed",
+                1350.0,
+                List.of(Material.BIRCH_WOOD),
+                Style.MODERN,
+                tenantId
+        );
+
+        Product createdProduct = new Product(
+                UUID.randomUUID(),
+                productDTO.name(),
+                productDTO.description(),
+                productDTO.price(),
+                productDTO.materials(),
+                productDTO.style(),
+                productDTO.tenantId()
+        );
+
+        when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
+
+        MvcResult createResult = mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productDTO)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String responseBody = createResult.getResponse().getContentAsString();
+        Product createdResponse = objectMapper.readValue(responseBody, Product.class);
+        UUID productId = createdResponse.getId();
+
+        ProductDTO productUpdated = new ProductDTO(
+                "Big Bed",
+                "A big bed",
+                1550.0,
+                List.of(Material.BIRCH_WOOD),
+                Style.MODERN,
+                tenantId
+        );
+
+        when(productService.update(any(UUID.class), any(UUID.class), any(ProductDTO.class))).thenReturn(createdProduct);
+
+        MvcResult updateResult = mockMvc.perform(put("/products/" + tenantId + "/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productUpdated)))
                 .andExpect(status().isOk())
@@ -117,9 +191,9 @@ public class ProductControllerTest {
     @Test
     void shouldReturnBadRequestForNullProduct() throws Exception {
         doThrow(new BusinessException("Product data must not be null."))
-                .when(productService).update(any(UUID.class), any(ProductDTO.class));
+                .when(productService).update(any(UUID.class), any(UUID.class), any(ProductDTO.class));
 
-        mockMvc.perform(put("/products/" + null)
+        mockMvc.perform(put("/products/" + tenantId + "/" + null)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
                 .andExpect(status().isBadRequest());
@@ -129,7 +203,7 @@ public class ProductControllerTest {
     void shouldReturnNotFoundForInvalidProduct() throws Exception {
         UUID productId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        mockMvc.perform(put("/products/" + productId)
+        mockMvc.perform(put("/products/" + tenantId + "/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isNotFound());
@@ -137,9 +211,24 @@ public class ProductControllerTest {
 
     @Test
     void shouldCreateAndDeleteProduct() throws Exception {
-        ProductDTO productDTO = new ProductDTO("Table", "A wooden Table", 350.0, List.of(Material.BIRCH_WOOD));
-        Product createdProduct = new Product(UUID.randomUUID(), productDTO.name(), productDTO.description(), productDTO.price(), new ArrayList<>());
+        ProductDTO productDTO = new ProductDTO(
+                "Table",
+                "A wooden table",
+                350.0,
+                List.of(Material.PINE_WOOD),
+                Style.MODERN,
+                tenantId
+        );
 
+        Product createdProduct = new Product(
+                UUID.randomUUID(),
+                productDTO.name(),
+                productDTO.description(),
+                productDTO.price(),
+                productDTO.materials(),
+                productDTO.style(),
+                productDTO.tenantId()
+        );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
@@ -153,9 +242,9 @@ public class ProductControllerTest {
         Product createdResponse = objectMapper.readValue(responseBody, Product.class);
         UUID productId = createdResponse.getId();
 
-        when(productService.get(productId)).thenReturn(createdResponse);
+        when(productService.get(tenantId, productId)).thenReturn(createdResponse);
 
-        mockMvc.perform(delete("/products/" + productId))
+        mockMvc.perform(delete("/products/" + tenantId + "/" + productId))
                 .andExpect(status().isNoContent());
     }
 
@@ -163,7 +252,7 @@ public class ProductControllerTest {
     void shouldReturnNotFoundForDeleteProduct() throws Exception {
         UUID productId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        mockMvc.perform(delete("/products/" + productId))
+        mockMvc.perform(delete("/products/" + tenantId + "/" + productId))
                 .andExpect(status().isNotFound());
     }
 }

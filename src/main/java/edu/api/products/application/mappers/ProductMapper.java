@@ -10,6 +10,7 @@ public class ProductMapper {
                 .description(dto.description())
                 .price(dto.price())
                 .materials(dto.materials())
+                .tenantId(dto.tenantId())
                 .build();
     }
 }
