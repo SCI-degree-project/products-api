@@ -1,6 +1,7 @@
 package edu.api.products.application.mappers;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.ProductPreviewDTO;
 import edu.api.products.domain.Product;
 
 public class ProductMapper {
@@ -14,4 +15,12 @@ public class ProductMapper {
                 .tenantId(dto.tenantId())
                 .build();
     }
+
+    public static ProductPreviewDTO toPreview(Product product) {
+        return new ProductPreviewDTO(
+                product.getId(),
+                product.getName()
+        );
+    }
+
 }

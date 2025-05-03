@@ -1,9 +1,11 @@
 package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.ProductPreviewDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
+import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.application.services.ProductService;
 import edu.api.products.domain.Product;
 import jakarta.validation.Valid;
@@ -86,7 +88,7 @@ public class ProductController {
     }
 
     @GetMapping("/{tenantId}")
-    public ResponseEntity<Page<Product>> getProducts(
+    public ResponseEntity<Page<ProductPreviewDTO>> getProducts(
             @PathVariable UUID tenantId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -94,7 +96,7 @@ public class ProductController {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Product> products = productService.getProducts(tenantId, pageable);
-            return ResponseEntity.ok(products);
+            return ResponseEntity.ok(products.map(ProductMapper::toPreview));
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
