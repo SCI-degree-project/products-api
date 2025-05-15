@@ -6,7 +6,10 @@ import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.domain.Product;
+import edu.api.products.domain.ProductConstants;
 import edu.api.products.infrastructure.IProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -43,7 +46,7 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product Id must not be null.");
         }
 
-        return existProduct(tenantId, id);
+        return validateProductExistence(tenantId, id);
     }
 
     @Override
@@ -60,11 +63,15 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product data must not be null.");
         }
 
-        Product existingProduct = existProduct(tenantId, productId);
+        Product existingProduct = validateProductExistence(tenantId, productId);
 
         existingProduct.setName(product.name());
         existingProduct.setDescription(product.description());
         existingProduct.setPrice(product.price());
+        existingProduct.setMaterials(product.materials());
+        existingProduct.setStyle(product.style());
+        existingProduct.setGallery(product.gallery());
+        existingProduct.setModel(product.model());
 
         validateProduct(existingProduct);
 
@@ -81,23 +88,39 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product ID must not be null.");
         }
 
-        existProduct(tenantId, id);
+        validateProductExistence(tenantId, id);
 
         productRepository.deleteById(id);
     }
+
+    @Override
+    public Page<Product> getProducts(UUID tenantId, Pageable pageable) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
+        }
+        return productRepository.findAllByTenantId(tenantId, pageable);
+    }
+
+    @Override
+    public void deleteAllByTenantId(UUID tenantId) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
+        }
+        productRepository.deleteByTenantId(tenantId);
+    }
+
 
     private void validateProduct(Product product) {
         if(product.getName() == null || product.getName().isEmpty()){
             throw new BusinessException("Unable to create the product. Empty name.");
         }
 
-        double MAX_PRICE = 100000;
-        if(product.getPrice() <= 0 || product.getPrice() >= MAX_PRICE){
+        if(product.getPrice() <= 0 || product.getPrice() >= ProductConstants.MAX_PRODUCT_PRICE){
             throw new BusinessException("Unable to create the product. Price out of range.");
         }
     }
 
-    private Product existProduct(UUID tenantId, UUID productId) {
+    private Product validateProductExistence(UUID tenantId, UUID productId) {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found."));
 

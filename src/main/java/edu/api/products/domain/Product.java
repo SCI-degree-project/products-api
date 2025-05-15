@@ -26,9 +26,15 @@ public class Product {
     @CollectionTable(name = "product_materials", joinColumns = @JoinColumn(name = "product_id"))
     @Enumerated(EnumType.STRING)
     List<Material> materials;
-    @CollectionTable(name = "product_styles", joinColumns = @JoinColumn(name = "product_id"))
     @Enumerated(EnumType.STRING)
+    @Column(name = "style")
     Style style;
     @Column(nullable = false)
     UUID tenantId;
+    @ElementCollection
+    @CollectionTable(name = "product_gallery", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    List<String> gallery;
+    @Column(name = "model_url")
+    String model;
 }
