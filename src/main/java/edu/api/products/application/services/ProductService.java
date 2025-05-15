@@ -68,6 +68,10 @@ public class ProductService implements IProductService {
         existingProduct.setName(product.name());
         existingProduct.setDescription(product.description());
         existingProduct.setPrice(product.price());
+        existingProduct.setMaterials(product.materials());
+        existingProduct.setStyle(product.style());
+        existingProduct.setGallery(product.gallery());
+        existingProduct.setModel(product.model());
 
         validateProduct(existingProduct);
 

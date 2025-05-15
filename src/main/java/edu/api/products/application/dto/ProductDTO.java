@@ -15,5 +15,7 @@ public record ProductDTO(
         @Positive double price,
         @NotNull List<Material> materials,
         @NotNull Style style,
-        @NotNull UUID tenantId
+        @NotNull UUID tenantId,
+        @NotNull List<String> gallery,
+        @NotNull String model
 ) { }
