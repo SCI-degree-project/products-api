@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,17 +38,15 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product get(UUID tenantId, UUID id) {
-        if (tenantId == null) {
-            throw new BusinessException("Tenant Id must not be null.");
+    public Product getById(UUID productId) {
+        if (productId == null) {
+            throw new BusinessException("Product ID must not be null.");
         }
 
-        if (id == null) {
-            throw new BusinessException("Product Id must not be null.");
-        }
-
-        return validateProductExistence(tenantId, id);
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
     }
+
 
     @Override
     public Product update(UUID tenantId, UUID productId, ProductDTO product) {
@@ -129,5 +128,14 @@ public class ProductService implements IProductService {
         }
 
         return existingProduct;
+    }
+
+    @Override
+    public List<Product> getProductsByIds(List<UUID> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            throw new BusinessException("Product ID list must not be null or empty.");
+        }
+
+        return productRepository.findAllByIdIn(productIds);
     }
 }
