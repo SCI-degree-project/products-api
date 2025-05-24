@@ -48,7 +48,9 @@ public class ProductControllerTest {
                 150.0,
                 List.of(Material.BIRCH_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                null,
+                ""
         );
         Product createdProduct = new Product(
                 UUID.randomUUID(),
@@ -57,7 +59,9 @@ public class ProductControllerTest {
                 productDTO.price(),
                 productDTO.materials(),
                 productDTO.style(),
-                productDTO.tenantId()
+                productDTO.tenantId(),
+                productDTO.gallery(),
+                productDTO.model()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
@@ -76,7 +80,9 @@ public class ProductControllerTest {
                 -50.0,
                 List.of(Material.PINE_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                List.of(),
+                ""
         );
 
         doThrow(new BusinessException("Price out of range"))
@@ -96,7 +102,9 @@ public class ProductControllerTest {
                 150.0,
                 List.of(Material.BIRCH_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                List.of(),
+                ""
         );
 
         Product createdProduct = new Product(
@@ -106,7 +114,9 @@ public class ProductControllerTest {
                 productDTO.price(),
                 productDTO.materials(),
                 productDTO.style(),
-                productDTO.tenantId()
+                productDTO.tenantId(),
+                productDTO.gallery(),
+                productDTO.model()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
@@ -121,9 +131,9 @@ public class ProductControllerTest {
         Product createdResponse = objectMapper.readValue(responseBody, Product.class);
         UUID productId = createdResponse.getId();
 
-        when(productService.get(any(UUID.class), any(UUID.class))).thenReturn(createdProduct);
+        when(productService.getById(any(UUID.class))).thenReturn(createdProduct);
 
-        mockMvc.perform(get("/products/" + tenantId + "/" + productId)
+        mockMvc.perform(get("/products/" + productId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -136,7 +146,9 @@ public class ProductControllerTest {
                 1350.0,
                 List.of(Material.BIRCH_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                List.of(),
+                ""
         );
 
         Product createdProduct = new Product(
@@ -146,7 +158,9 @@ public class ProductControllerTest {
                 productDTO.price(),
                 productDTO.materials(),
                 productDTO.style(),
-                productDTO.tenantId()
+                productDTO.tenantId(),
+                productDTO.gallery(),
+                productDTO.model()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
@@ -167,7 +181,9 @@ public class ProductControllerTest {
                 1550.0,
                 List.of(Material.BIRCH_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                List.of(),
+                ""
         );
 
         when(productService.update(any(UUID.class), any(UUID.class), any(ProductDTO.class))).thenReturn(createdProduct);
@@ -217,7 +233,9 @@ public class ProductControllerTest {
                 350.0,
                 List.of(Material.PINE_WOOD),
                 Style.MODERN,
-                tenantId
+                tenantId,
+                List.of(),
+                ""
         );
 
         Product createdProduct = new Product(
@@ -227,7 +245,9 @@ public class ProductControllerTest {
                 productDTO.price(),
                 productDTO.materials(),
                 productDTO.style(),
-                productDTO.tenantId()
+                productDTO.tenantId(),
+                productDTO.gallery(),
+                productDTO.model()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
@@ -242,9 +262,9 @@ public class ProductControllerTest {
         Product createdResponse = objectMapper.readValue(responseBody, Product.class);
         UUID productId = createdResponse.getId();
 
-        when(productService.get(tenantId, productId)).thenReturn(createdResponse);
+        when(productService.getById(productId)).thenReturn(createdResponse);
 
-        mockMvc.perform(delete("/products/" + tenantId + "/" + productId))
+        mockMvc.perform(delete("/products/" + productId))
                 .andExpect(status().isNoContent());
     }
 

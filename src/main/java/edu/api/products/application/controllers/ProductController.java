@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,10 +40,10 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{tenantId}/{productId}")
-    public ResponseEntity<Product> getProduct(@PathVariable UUID tenantId, @PathVariable UUID productId) {
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<Product> getProduct(@PathVariable UUID productId) {
         try {
-            Product product = productService.get(tenantId, productId);
+            Product product = productService.getById(productId);
             return ResponseEntity.status(HttpStatus.OK).body(product);
         } catch (InvalidTenantException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -109,6 +110,21 @@ public class ProductController {
         try {
             productService.deleteAllByTenantId(tenantId);
             return ResponseEntity.noContent().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<ProductPreviewDTO>> getProductsBatch(@RequestBody List<UUID> productIds) {
+        try {
+            List<Product> products = productService.getProductsByIds(productIds);
+            List<ProductPreviewDTO> previews = products.stream()
+                    .map(ProductMapper::toPreview)
+                    .toList();
+            return ResponseEntity.ok(previews);
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
