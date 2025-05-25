@@ -1,6 +1,7 @@
 package edu.api.products.application.services;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
@@ -137,5 +138,20 @@ public class ProductService implements IProductService {
         }
 
         return productRepository.findAllByIdIn(productIds);
+    }
+
+    @Override
+    public Product partialUpdate(UUID tenantId, UUID productId, UpdateProductDTO dto) {
+        if (tenantId == null || productId == null) {
+            throw new BusinessException("IDs must not be null.");
+        }
+
+        Product existingProduct = validateProductExistence(tenantId, productId);
+
+        ProductMapper.partialUpdate(existingProduct, dto);
+
+        validateProduct(existingProduct);
+
+        return productRepository.save(existingProduct);
     }
 }
