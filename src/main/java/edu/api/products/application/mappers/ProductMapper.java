@@ -2,6 +2,7 @@ package edu.api.products.application.mappers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductPreviewDTO;
+import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.ProductConstants;
 
@@ -36,5 +37,30 @@ public class ProductMapper {
         );
     }
 
+    public static void partialUpdate(Product product, UpdateProductDTO dto) {
+        if (dto.name() != null) product.setName(dto.name());
+        if (dto.description() != null) product.setDescription(dto.description());
+        if (dto.price() != null) product.setPrice(dto.price());
+        if (dto.materials() != null) product.setMaterials(dto.materials());
+        if (dto.style() != null) product.setStyle(dto.style());
+        if (dto.gallery() != null) product.setGallery(dto.gallery());
+        if (dto.model() != null) product.setModel(dto.model());
+    }
 
+    public static ProductDTO toDTO(Product product) {
+        if (product == null) {
+            return null;
+        }
+
+        return new ProductDTO(
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getMaterials(),
+                product.getStyle(),
+                product.getTenantId(),
+                product.getGallery(),
+                product.getModel()
+        );
+    }
 }

@@ -1,6 +1,7 @@
 package edu.api.products.application.services;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,5 @@ public interface IProductService {
     Page<Product> getProducts(UUID tenantId, Pageable pageable);
     void deleteAllByTenantId(UUID tenantId);
     List<Product> getProductsByIds(List<UUID> productIds);
+    Product partialUpdate(UUID tenantId, UUID productId, UpdateProductDTO dto);
 }

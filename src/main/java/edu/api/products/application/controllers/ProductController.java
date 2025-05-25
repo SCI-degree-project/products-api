@@ -2,6 +2,7 @@ package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductPreviewDTO;
+import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
@@ -131,4 +132,25 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @PatchMapping("/{tenantId}/{productId}")
+    public ResponseEntity<ProductDTO> patchProduct(
+            @PathVariable UUID tenantId,
+            @PathVariable UUID productId,
+            @RequestBody UpdateProductDTO dto
+    ) {
+        try {
+            Product updated = productService.partialUpdate(tenantId, productId, dto);
+            return ResponseEntity.ok(ProductMapper.toDTO(updated));
+        } catch (InvalidTenantException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
