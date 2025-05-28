@@ -2,13 +2,16 @@ package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductPreviewDTO;
+import edu.api.products.application.dto.ProductSearchCriteria;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.application.services.ProductService;
+import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
+import edu.api.products.domain.Style;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +96,7 @@ public class ProductController {
     public ResponseEntity<Page<ProductPreviewDTO>> getProducts(
             @PathVariable UUID tenantId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         try {
             Pageable pageable = PageRequest.of(page, size);
@@ -153,4 +156,21 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductPreviewDTO>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Style style,
+            @RequestParam(required = false) List<Material> materials,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        ProductSearchCriteria criteria = new ProductSearchCriteria(name, style, materials, sortBy, direction, page, size);
+        Page<Product> results = productService.searchProducts(criteria);
+        List<ProductPreviewDTO> previews = results.getContent().stream()
+                .map(ProductMapper::toPreview)
+                .toList();
+        return ResponseEntity.ok(previews);
+    }
 }

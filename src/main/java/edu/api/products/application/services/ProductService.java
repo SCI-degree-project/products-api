@@ -1,6 +1,7 @@
 package edu.api.products.application.services;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.ProductSearchCriteria;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
@@ -9,19 +10,25 @@ import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.ProductConstants;
 import edu.api.products.infrastructure.IProductRepository;
+import edu.api.products.infrastructure.IProductRepositoryCustom;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ProductService implements IProductService {
     private final IProductRepository productRepository;
+    private final IProductRepositoryCustom productRepositoryCustom;
 
-    public ProductService(IProductRepository productRepository) {
+    public ProductService(IProductRepository productRepository, IProductRepositoryCustom productRepositoryCustom) {
         this.productRepository = productRepository;
+        this.productRepositoryCustom = productRepositoryCustom;
     }
 
     @Override
@@ -153,5 +160,22 @@ public class ProductService implements IProductService {
         validateProduct(existingProduct);
 
         return productRepository.save(existingProduct);
+    }
+
+    @Override
+    public Page<Product> searchProducts(ProductSearchCriteria criteria) {
+        Sort sort = Sort.by(
+                "desc".equalsIgnoreCase(criteria.direction()) ? Sort.Direction.DESC : Sort.Direction.ASC,
+                Optional.ofNullable(criteria.sortBy()).orElse("name")
+        );
+
+        Pageable pageable = PageRequest.of(criteria.page(), criteria.size(), sort);
+
+        return productRepositoryCustom.search(
+                criteria.name(),
+                criteria.style(),
+                criteria.materials(),
+                pageable
+        );
     }
 }

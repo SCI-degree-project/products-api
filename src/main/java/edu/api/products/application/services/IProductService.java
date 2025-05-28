@@ -1,6 +1,7 @@
 package edu.api.products.application.services;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.ProductSearchCriteria;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.domain.Product;
 import org.springframework.data.domain.Page;
@@ -18,4 +19,5 @@ public interface IProductService {
     void deleteAllByTenantId(UUID tenantId);
     List<Product> getProductsByIds(List<UUID> productIds);
     Product partialUpdate(UUID tenantId, UUID productId, UpdateProductDTO dto);
+    Page<Product> searchProducts(ProductSearchCriteria criteria);
 }
