@@ -19,5 +19,5 @@ public interface IProductService {
     void deleteAllByTenantId(UUID tenantId);
     List<Product> getProductsByIds(List<UUID> productIds);
     Product partialUpdate(UUID tenantId, UUID productId, UpdateProductDTO dto);
-    Page<Product> searchProducts(ProductSearchCriteria criteria);
+    Page<Product> search(ProductSearchCriteria criteria, Pageable pageable);
 }

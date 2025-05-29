@@ -163,19 +163,11 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> searchProducts(ProductSearchCriteria criteria) {
-        Sort sort = Sort.by(
-                "desc".equalsIgnoreCase(criteria.direction()) ? Sort.Direction.DESC : Sort.Direction.ASC,
-                Optional.ofNullable(criteria.sortBy()).orElse("name")
-        );
-
-        Pageable pageable = PageRequest.of(criteria.page(), criteria.size(), sort);
-
-        return productRepositoryCustom.search(
-                criteria.name(),
-                criteria.style(),
-                criteria.materials(),
-                pageable
-        );
+    public Page<Product> search(ProductSearchCriteria criteria, Pageable pageable) {
+        if (criteria == null) {
+            throw new BusinessException("Search criteria must not be null.");
+        }
+        return productRepositoryCustom.search(criteria, pageable);
     }
+
 }

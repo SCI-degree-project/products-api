@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -156,21 +157,40 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<ProductPreviewDTO>> searchProducts(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Style style,
-            @RequestParam(required = false) List<Material> materials,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction,
+    @PostMapping("/search")
+    public ResponseEntity<Page<ProductPreviewDTO>> searchProducts(
+            @RequestBody ProductSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        ProductSearchCriteria criteria = new ProductSearchCriteria(name, style, materials, sortBy, direction, page, size);
-        Page<Product> results = productService.searchProducts(criteria);
-        List<ProductPreviewDTO> previews = results.getContent().stream()
-                .map(ProductMapper::toPreview)
-                .toList();
-        return ResponseEntity.ok(previews);
+        try {
+            List<String> allowedSortBy = List.of("name", "price");
+            List<String> allowedDirections = List.of("asc", "desc");
+
+            String sortBy = criteria.sortBy() != null ? criteria.sortBy() : "name";
+            String sortDirection = criteria.direction() != null ? criteria.direction() : "asc";
+
+            if (!allowedSortBy.contains(sortBy.toLowerCase())) {
+                return ResponseEntity.badRequest().body(Page.empty());
+            }
+
+            if (!allowedDirections.contains(sortDirection.toLowerCase())) {
+                return ResponseEntity.badRequest().body(Page.empty());
+            }
+
+            Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+            Pageable pageable = PageRequest.of(page, size, sort);
+
+            Page<Product> results = productService.search(criteria, pageable);
+            Page<ProductPreviewDTO> previews = results.map(ProductMapper::toPreview);
+
+            return ResponseEntity.ok(previews);
+
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
 }
