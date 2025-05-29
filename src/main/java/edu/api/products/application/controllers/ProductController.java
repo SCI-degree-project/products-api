@@ -2,17 +2,21 @@ package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductPreviewDTO;
+import edu.api.products.application.dto.ProductSearchCriteria;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.application.services.ProductService;
+import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
+import edu.api.products.domain.Style;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -93,7 +97,7 @@ public class ProductController {
     public ResponseEntity<Page<ProductPreviewDTO>> getProducts(
             @PathVariable UUID tenantId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         try {
             Pageable pageable = PageRequest.of(page, size);
@@ -146,6 +150,42 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<Page<ProductPreviewDTO>> searchProducts(
+            @RequestBody ProductSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        try {
+            List<String> allowedSortBy = List.of("name", "price");
+            List<String> allowedDirections = List.of("asc", "desc");
+
+            String sortBy = criteria.sortBy() != null ? criteria.sortBy() : "name";
+            String sortDirection = criteria.direction() != null ? criteria.direction() : "asc";
+
+            if (!allowedSortBy.contains(sortBy.toLowerCase())) {
+                return ResponseEntity.badRequest().body(Page.empty());
+            }
+
+            if (!allowedDirections.contains(sortDirection.toLowerCase())) {
+                return ResponseEntity.badRequest().body(Page.empty());
+            }
+
+            Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+            Pageable pageable = PageRequest.of(page, size, sort);
+
+            Page<Product> results = productService.search(criteria, pageable);
+            Page<ProductPreviewDTO> previews = results.map(ProductMapper::toPreview);
+
+            return ResponseEntity.ok(previews);
+
         } catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
