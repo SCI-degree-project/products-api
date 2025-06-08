@@ -12,13 +12,11 @@ import edu.api.products.domain.ProductConstants;
 import edu.api.products.infrastructure.IProductRepository;
 import edu.api.products.infrastructure.IProductRepositoryCustom;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -51,7 +49,7 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product ID must not be null.");
         }
 
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found."));
     }
 
@@ -87,17 +85,14 @@ public class ProductService implements IProductService {
 
     @Override
     public void delete(UUID tenantId, UUID id) {
-        if (tenantId == null) {
-            throw new BusinessException("Tenant Id must not be null.");
+        if (tenantId == null || id == null) {
+            throw new BusinessException("IDs must not be null.");
         }
 
-        if (id == null) {
-            throw new BusinessException("Product ID must not be null.");
-        }
-
-        validateProductExistence(tenantId, id);
-
-        productRepository.deleteById(id);
+        Product product = validateProductExistence(tenantId, id);
+        product.setDeleted(true);
+        product.setDeletedAt(LocalDateTime.now());
+        productRepository.save(product);
     }
 
     @Override
@@ -105,7 +100,7 @@ public class ProductService implements IProductService {
         if (tenantId == null) {
             throw new BusinessException("Tenant Id must not be null.");
         }
-        return productRepository.findAllByTenantId(tenantId, pageable);
+        return productRepository.findAllByTenantIdAndIsDeletedFalse(tenantId, pageable);
     }
 
     @Override
@@ -144,7 +139,7 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product ID list must not be null or empty.");
         }
 
-        return productRepository.findAllByIdIn(productIds);
+        return productRepository.findAllByIdInAndIsDeletedFalse(productIds);
     }
 
     @Override

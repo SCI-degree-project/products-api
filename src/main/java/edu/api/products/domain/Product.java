@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -17,24 +18,43 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "product_id", unique = true, nullable = false)
-    UUID id;
+    private UUID id;
+
     @Column(nullable = false)
-    String name;
-    String description;
-    double price;
+    private String name;
+
+    private String description;
+
+    private double price;
+
     @ElementCollection
     @CollectionTable(name = "product_materials", joinColumns = @JoinColumn(name = "product_id"))
     @Enumerated(EnumType.STRING)
-    List<Material> materials;
+    private List<Material> materials;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "style")
-    Style style;
+    private Style style;
+
     @Column(nullable = false)
-    UUID tenantId;
+    private UUID tenantId;
+
     @ElementCollection
     @CollectionTable(name = "product_gallery", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
-    List<String> gallery;
+    private List<String> gallery;
+
     @Column(name = "model_url")
-    String model;
+    private String model;
+
+    @Column(nullable = false)
+    private boolean isDeleted = Boolean.FALSE;
+
+    private LocalDateTime deletedAt;
+
+    @Column(nullable = false)
+    private boolean isVisible = Boolean.TRUE;
+
+    @Embedded
+    private Dimensions dimensions;
 }
