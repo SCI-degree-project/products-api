@@ -1,5 +1,6 @@
 package edu.api.products.application.dto;
 
+import edu.api.products.domain.Dimensions;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Style;
 import jakarta.validation.constraints.NotBlank;
@@ -17,5 +18,8 @@ public record ProductDTO(
         @NotNull Style style,
         @NotNull UUID tenantId,
         @NotNull List<String> gallery,
-        @NotNull String model
+        @NotNull String model,
+        @NotNull Dimensions dimensions,
+        Boolean isVisible,
+        Boolean isDeleted
 ) { }
