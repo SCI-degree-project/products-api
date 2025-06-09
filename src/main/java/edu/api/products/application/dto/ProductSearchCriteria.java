@@ -4,6 +4,7 @@ import edu.api.products.domain.Material;
 import edu.api.products.domain.Style;
 
 import java.util.List;
+import java.util.UUID;
 
 public record ProductSearchCriteria(
         String name,
@@ -12,5 +13,6 @@ public record ProductSearchCriteria(
         String sortBy,
         String direction,
         int page,
-        int size
+        int size,
+        UUID tenantId
 ) { }
