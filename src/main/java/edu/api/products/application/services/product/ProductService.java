@@ -54,7 +54,7 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product ID must not be null.");
         }
 
-        return productRepository.findByIdAndIsDeletedFalse(productId)
+        return productRepository.findByIdAndDeletedFalse(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found."));
     }
 
@@ -105,7 +105,7 @@ public class ProductService implements IProductService {
         if (tenantId == null) {
             throw new BusinessException("Tenant Id must not be null.");
         }
-        return productRepository.findAllByTenantIdAndIsDeletedFalse(tenantId, pageable);
+        return productRepository.findAllByTenantIdAndDeletedFalse(tenantId, pageable);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ProductService implements IProductService {
             throw new BusinessException("Product ID list must not be null or empty.");
         }
 
-        return productRepository.findAllByIdInAndIsDeletedFalse(productIds);
+        return productRepository.findAllByIdInAndDeletedFalse(productIds);
     }
 
     @Override

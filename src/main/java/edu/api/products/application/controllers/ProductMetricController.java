@@ -18,7 +18,21 @@ public class ProductMetricController {
 
     private final ProductMetricService productMetricService;
 
-    @PostMapping("/product-click/{productId}")
+    @GetMapping("/metrics/{productId}")
+    public ResponseEntity<ProductMetric> getProductMetric(@PathVariable UUID productId) {
+        try {
+            ProductMetric metric = productMetricService.getProductMetric(productId);
+            return ResponseEntity.ok(metric);
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/metrics/click/{productId}")
     public ResponseEntity<Void> registerClick(@PathVariable UUID productId) {
         try {
             productMetricService.incrementClickMetric(productId);
@@ -32,11 +46,25 @@ public class ProductMetricController {
         }
     }
 
-    @GetMapping("/product-metric/{productId}")
-    public ResponseEntity<ProductMetric> getProductMetric(@PathVariable UUID productId) {
+    @PostMapping("/metrics/ar-views/{productId}")
+    public ResponseEntity<Void> registerArView(@PathVariable UUID productId) {
         try {
-            ProductMetric metric = productMetricService.getProductMetric(productId);
-            return ResponseEntity.ok(metric);
+            productMetricService.incrementArViewMetric(productId);
+            return ResponseEntity.ok().build();
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/metrics/search-appearances/{productId}")
+    public ResponseEntity<Void> registerSearchAppearances(@PathVariable UUID productId) {
+        try {
+            productMetricService.incrementSearchAppearMetric(productId);
+            return ResponseEntity.ok().build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
         }catch (BusinessException e) {

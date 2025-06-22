@@ -14,7 +14,7 @@ public record UpdateProductDTO(
         Style style,
         List<String> gallery,
         String model,
-        Dimensions dimensions,
-        Boolean isVisible,
-        Boolean isDeleted
+        Boolean deleted,
+        Boolean visible,
+        Dimensions dimensions
 ) {}

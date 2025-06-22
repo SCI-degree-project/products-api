@@ -14,7 +14,7 @@ public interface IProductRepository extends JpaRepository<Product, UUID> {
     void deleteByTenantId(UUID tenantId);
     List<Product> findAllByIdIn(List<UUID> ids);
 
-    Page<Product> findAllByTenantIdAndIsDeletedFalse(UUID tenantId, Pageable pageable);
-    Optional<Product> findByIdAndIsDeletedFalse(UUID productId);
-    List<Product> findAllByIdInAndIsDeletedFalse(List<UUID> ids);
+    Page<Product> findAllByTenantIdAndDeletedFalse(UUID tenantId, Pageable pageable);
+    Optional<Product> findByIdAndDeletedFalse(UUID productId);
+    List<Product> findAllByIdInAndDeletedFalse(List<UUID> ids);
 }

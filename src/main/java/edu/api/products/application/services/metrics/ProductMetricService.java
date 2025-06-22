@@ -49,4 +49,44 @@ public class ProductMetricService implements IProductMetricService {
         metric.setClicks(metric.getClicks() + 1);
         productMetricRepository.save(metric);
     }
+
+    @Override
+    public void incrementArViewMetric(UUID productId) {
+        if (productId == null) {
+            throw new BusinessException("Product ID must not be null.");
+        }
+
+        productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
+
+        ProductMetric metric = productMetricRepository.findByProductId(productId)
+                .orElseGet(() -> ProductMetric.builder()
+                        .productId(productId)
+                        .arViews(0)
+                        .build()
+                );
+
+        metric.setArViews(metric.getArViews() + 1);
+        productMetricRepository.save(metric);
+    }
+
+    @Override
+    public void incrementSearchAppearMetric(UUID productId) {
+        if (productId == null) {
+            throw new BusinessException("Product ID must not be null.");
+        }
+
+        productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found."));
+
+        ProductMetric metric = productMetricRepository.findByProductId(productId)
+                .orElseGet(() -> ProductMetric.builder()
+                        .productId(productId)
+                        .searchAppearances(0)
+                        .build()
+                );
+
+        metric.setSearchAppearances(metric.getSearchAppearances() + 1);
+        productMetricRepository.save(metric);
+    }
 }
