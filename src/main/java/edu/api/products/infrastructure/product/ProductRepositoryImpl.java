@@ -58,7 +58,6 @@ public class ProductRepositoryImpl implements IProductRepositoryCustom {
 
     private List<Predicate> buildPredicates(CriteriaBuilder cb, Root<Product> root, ProductSearchCriteria criteria) {
         List<Predicate> predicates = new ArrayList<>();
-
         if (criteria.name() != null && !criteria.name().isBlank()) {
             predicates.add(cb.like(cb.lower(root.get("name")), "%" + criteria.name().toLowerCase() + "%"));
         }
@@ -70,6 +69,12 @@ public class ProductRepositoryImpl implements IProductRepositoryCustom {
         if (criteria.materials() != null && !criteria.materials().isEmpty()) {
             predicates.add(root.join("materials").in(criteria.materials()));
         }
+
+        if (criteria.tenantId() != null) {
+            predicates.add(cb.equal(root.get("tenantId"), criteria.tenantId()));
+        }
+
+        predicates.add(cb.isFalse(root.get("isDeleted")));
 
         return predicates;
     }

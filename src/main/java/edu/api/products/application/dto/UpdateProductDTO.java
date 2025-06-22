@@ -1,5 +1,6 @@
 package edu.api.products.application.dto;
 
+import edu.api.products.domain.Dimensions;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Style;
 
@@ -12,5 +13,8 @@ public record UpdateProductDTO(
         List<Material> materials,
         Style style,
         List<String> gallery,
-        String model
+        String model,
+        Dimensions dimensions,
+        Boolean isVisible,
+        Boolean isDeleted
 ) {}

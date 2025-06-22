@@ -46,6 +46,9 @@ public class ProductMapper {
         if (dto.style() != null) product.setStyle(dto.style());
         if (dto.gallery() != null) product.setGallery(dto.gallery());
         if (dto.model() != null) product.setModel(dto.model());
+        if (dto.dimensions() != null) product.setDimensions(dto.dimensions());
+        if (dto.isVisible() != null) product.setVisible(dto.isVisible());
+        if (dto.isDeleted() != null) product.setDeleted(dto.isDeleted());
     }
 
     public static ProductDTO toDTO(Product product) {
@@ -61,7 +64,10 @@ public class ProductMapper {
                 product.getStyle(),
                 product.getTenantId(),
                 product.getGallery(),
-                product.getModel()
+                product.getModel(),
+                product.getDimensions(),
+                product.isVisible(),
+                product.isDeleted()
         );
     }
 }

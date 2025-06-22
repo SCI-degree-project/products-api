@@ -9,6 +9,7 @@ import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.application.services.product.ProductService;
+
 import edu.api.products.domain.Product;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -190,5 +191,4 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 }
