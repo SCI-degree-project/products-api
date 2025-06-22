@@ -8,7 +8,8 @@ import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
-import edu.api.products.application.services.ProductService;
+import edu.api.products.application.services.product.ProductService;
+
 import edu.api.products.domain.Product;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

@@ -3,7 +3,7 @@ package edu.api.products.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
-import edu.api.products.application.services.ProductService;
+import edu.api.products.application.services.product.ProductService;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.Style;
@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

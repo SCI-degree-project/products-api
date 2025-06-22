@@ -1,4 +1,4 @@
-package edu.api.products.application.services;
+package edu.api.products.application.services.product;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductSearchCriteria;

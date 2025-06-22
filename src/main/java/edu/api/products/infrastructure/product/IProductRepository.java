@@ -1,4 +1,4 @@
-package edu.api.products.infrastructure;
+package edu.api.products.infrastructure.product;
 
 import edu.api.products.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;

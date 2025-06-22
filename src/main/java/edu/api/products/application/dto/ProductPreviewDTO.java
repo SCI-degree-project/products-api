@@ -7,5 +7,6 @@ import java.util.UUID;
 public record ProductPreviewDTO(
         UUID id,
         String name,
-        String cover
+        String cover,
+        double price
 ) { }

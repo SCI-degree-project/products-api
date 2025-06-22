@@ -32,8 +32,9 @@ public class ProductMapper {
 
         return new ProductPreviewDTO(
                 product.getId(),
-                product.getName() != null ? product.getName() : "No name",
-                cover
+                product.getName() != null ? product.getName() : "Sin nombre",
+                cover,
+                product.getPrice()
         );
     }
 

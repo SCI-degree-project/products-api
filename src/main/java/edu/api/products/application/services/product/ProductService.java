@@ -1,4 +1,4 @@
-package edu.api.products.application.services;
+package edu.api.products.application.services.product;
 
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductSearchCriteria;
@@ -9,8 +9,9 @@ import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.ProductConstants;
-import edu.api.products.infrastructure.IProductRepository;
-import edu.api.products.infrastructure.IProductRepositoryCustom;
+import edu.api.products.domain.ProductMetric;
+import edu.api.products.infrastructure.product.IProductRepository;
+import edu.api.products.infrastructure.product.IProductRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,10 @@ public class ProductService implements IProductService {
         Product newProduct = ProductMapper.toEntity(product);
 
         validateProduct(newProduct);
+
+        ProductMetric.builder()
+                .productId(newProduct.getId())
+                .build();
 
         return productRepository.save(newProduct);
     }
