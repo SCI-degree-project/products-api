@@ -19,7 +19,8 @@ public record ProductDTO(
         @NotNull UUID tenantId,
         @NotNull List<String> gallery,
         @NotNull String model,
-        @NotNull Dimensions dimensions,
-        Boolean isVisible,
-        Boolean isDeleted
+        Boolean deleted,
+        Boolean visible,
+        @NotNull Dimensions dimensions
+
 ) { }

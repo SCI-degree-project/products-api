@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.services.product.ProductService;
+import edu.api.products.domain.Dimensions;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.Style;
@@ -48,8 +49,11 @@ public class ProductControllerTest {
                 List.of(Material.BIRCH_WOOD),
                 Style.MODERN,
                 tenantId,
-                null,
-                ""
+                List.of(),
+                "",
+                false,
+                true,
+                new Dimensions(10, 10, 10)
         );
         Product createdProduct = new Product(
                 UUID.randomUUID(),
@@ -60,12 +64,16 @@ public class ProductControllerTest {
                 productDTO.style(),
                 productDTO.tenantId(),
                 productDTO.gallery(),
-                productDTO.model()
-        );
+                productDTO.model(),
+                productDTO.deleted(),
+                null,
+                productDTO.visible(),
+                productDTO.dimensions()
+                );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productDTO)))
                 .andExpect(status().isCreated());
@@ -81,13 +89,16 @@ public class ProductControllerTest {
                 Style.MODERN,
                 tenantId,
                 List.of(),
-                ""
-        );
+                "",
+                true,
+                false,
+                new Dimensions()
+                );
 
         doThrow(new BusinessException("Price out of range"))
                 .when(productService).create(any(ProductDTO.class));
 
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidProductDTO)))
                 .andExpect(status().isBadRequest());
@@ -103,8 +114,11 @@ public class ProductControllerTest {
                 Style.MODERN,
                 tenantId,
                 List.of(),
-                ""
-        );
+                "",
+                true,
+                false,
+                new Dimensions()
+                );
 
         Product createdProduct = new Product(
                 UUID.randomUUID(),
@@ -115,12 +129,16 @@ public class ProductControllerTest {
                 productDTO.style(),
                 productDTO.tenantId(),
                 productDTO.gallery(),
-                productDTO.model()
+                productDTO.model(),
+                productDTO.deleted(),
+                null,
+                productDTO.visible(),
+                productDTO.dimensions()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
-        MvcResult createResult = mockMvc.perform(post("/products")
+        MvcResult createResult = mockMvc.perform(post("/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productDTO)))
                 .andExpect(status().isCreated())
@@ -132,7 +150,7 @@ public class ProductControllerTest {
 
         when(productService.getById(any(UUID.class))).thenReturn(createdProduct);
 
-        mockMvc.perform(get("/products/" + productId)
+        mockMvc.perform(get("/v1/products/" + productId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -147,8 +165,11 @@ public class ProductControllerTest {
                 Style.MODERN,
                 tenantId,
                 List.of(),
-                ""
-        );
+                "",
+                true,
+                false,
+                new Dimensions()
+                );
 
         Product createdProduct = new Product(
                 UUID.randomUUID(),
@@ -159,12 +180,16 @@ public class ProductControllerTest {
                 productDTO.style(),
                 productDTO.tenantId(),
                 productDTO.gallery(),
-                productDTO.model()
+                productDTO.model(),
+                productDTO.deleted(),
+                null,
+                productDTO.visible(),
+                productDTO.dimensions()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
-        MvcResult createResult = mockMvc.perform(post("/products")
+        MvcResult createResult = mockMvc.perform(post("/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productDTO)))
                 .andExpect(status().isCreated())
@@ -182,12 +207,15 @@ public class ProductControllerTest {
                 Style.MODERN,
                 tenantId,
                 List.of(),
-                ""
-        );
+                "",
+                true,
+                false,
+                new Dimensions()
+                );
 
         when(productService.update(any(UUID.class), any(UUID.class), any(ProductDTO.class))).thenReturn(createdProduct);
 
-        MvcResult updateResult = mockMvc.perform(put("/products/" + tenantId + "/" + productId)
+        MvcResult updateResult = mockMvc.perform(put("/v1/products/" + tenantId + "/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productUpdated)))
                 .andExpect(status().isOk())
@@ -208,7 +236,7 @@ public class ProductControllerTest {
         doThrow(new BusinessException("Product data must not be null."))
                 .when(productService).update(any(UUID.class), any(UUID.class), any(ProductDTO.class));
 
-        mockMvc.perform(put("/products/" + tenantId + "/" + null)
+        mockMvc.perform(put("/v1/products/" + tenantId + "/" + null)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(null)))
                 .andExpect(status().isBadRequest());
@@ -218,7 +246,7 @@ public class ProductControllerTest {
     void shouldReturnNotFoundForInvalidProduct() throws Exception {
         UUID productId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        mockMvc.perform(put("/products/" + tenantId + "/" + productId)
+        mockMvc.perform(put("/v1/products/" + tenantId + "/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isNotFound());
@@ -234,8 +262,11 @@ public class ProductControllerTest {
                 Style.MODERN,
                 tenantId,
                 List.of(),
-                ""
-        );
+                "",
+                true,
+                false,
+                new Dimensions()
+                );
 
         Product createdProduct = new Product(
                 UUID.randomUUID(),
@@ -246,12 +277,16 @@ public class ProductControllerTest {
                 productDTO.style(),
                 productDTO.tenantId(),
                 productDTO.gallery(),
-                productDTO.model()
+                productDTO.model(),
+                productDTO.deleted(),
+                null,
+                productDTO.visible(),
+                productDTO.dimensions()
         );
 
         when(productService.create(any(ProductDTO.class))).thenReturn(createdProduct);
 
-        MvcResult createResult = mockMvc.perform(post("/products")
+        MvcResult createResult = mockMvc.perform(post("/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(productDTO)))
                 .andExpect(status().isCreated())
@@ -263,7 +298,7 @@ public class ProductControllerTest {
 
         when(productService.getById(productId)).thenReturn(createdResponse);
 
-        mockMvc.perform(delete("/products/" + productId))
+        mockMvc.perform(delete("/v1/products/" + tenantId + "/" + productId))
                 .andExpect(status().isNoContent());
     }
 
@@ -271,7 +306,7 @@ public class ProductControllerTest {
     void shouldReturnNotFoundForDeleteProduct() throws Exception {
         UUID productId = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
-        mockMvc.perform(delete("/products/" + tenantId + "/" + productId))
+        mockMvc.perform(delete("/v1/products/" + tenantId + "/" + productId))
                 .andExpect(status().isNotFound());
     }
 }

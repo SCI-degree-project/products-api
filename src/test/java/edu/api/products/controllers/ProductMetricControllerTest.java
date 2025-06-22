@@ -124,4 +124,96 @@ class ProductMetricControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+
+    @Test
+    void testRegisterArView_success() {
+        UUID productId = UUID.randomUUID();
+
+        ResponseEntity<Void> response = controller.registerArView(productId);
+
+        verify(productMetricService, times(1)).incrementArViewMetric(productId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterArView_productNotFound() {
+        UUID productId = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-abcdef012345");
+
+        doThrow(new ProductNotFoundException("Product not found"))
+                .when(productMetricService).incrementArViewMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerArView(productId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterArView_businessException() {
+        UUID productId = UUID.randomUUID();
+
+        doThrow(new BusinessException("Invalid operation"))
+                .when(productMetricService).incrementArViewMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerArView(productId);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterArView_runtimeException() {
+        UUID productId = UUID.randomUUID();
+
+        doThrow(new RuntimeException("Something went wrong"))
+                .when(productMetricService).incrementArViewMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerArView(productId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterSearchAppear_success() {
+        UUID productId = UUID.randomUUID();
+
+        ResponseEntity<Void> response = controller.registerSearchAppearances(productId);
+
+        verify(productMetricService, times(1)).incrementSearchAppearMetric(productId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterSearchAppear_productNotFound() {
+        UUID productId = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-abcdef012345");
+
+        doThrow(new ProductNotFoundException("Product not found"))
+                .when(productMetricService).incrementSearchAppearMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerSearchAppearances(productId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterSearchAppear_businessException() {
+        UUID productId = UUID.randomUUID();
+
+        doThrow(new BusinessException("Invalid operation"))
+                .when(productMetricService).incrementSearchAppearMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerSearchAppearances(productId);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void testRegisterSearchAppear_runtimeException() {
+        UUID productId = UUID.randomUUID();
+
+        doThrow(new RuntimeException("Something went wrong"))
+                .when(productMetricService).incrementSearchAppearMetric(productId);
+
+        ResponseEntity<Void> response = controller.registerSearchAppearances(productId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
 }

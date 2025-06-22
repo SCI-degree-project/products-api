@@ -48,12 +48,12 @@ public class Product {
     private String model;
 
     @Column(nullable = false)
-    private boolean isDeleted = Boolean.FALSE;
+    private boolean deleted = Boolean.FALSE;
 
     private LocalDateTime deletedAt;
 
     @Column(nullable = false)
-    private boolean isVisible = Boolean.TRUE;
+    private boolean visible = Boolean.TRUE;
 
     @Embedded
     private Dimensions dimensions;

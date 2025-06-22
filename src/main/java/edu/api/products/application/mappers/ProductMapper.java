@@ -25,14 +25,12 @@ public class ProductMapper {
 
         if (product.getGallery() != null && !product.getGallery().isEmpty()) {
             int index = ProductConstants.PRODUCT_COVER_IMAGE_INDEX;
-            if (index >= 0 && index < product.getGallery().size()) {
-                cover = product.getGallery().get(index);
-            }
+            cover = product.getGallery().get(index);
         }
 
         return new ProductPreviewDTO(
                 product.getId(),
-                product.getName() != null ? product.getName() : "Sin nombre",
+                product.getName() != null ? product.getName() : "No name",
                 cover,
                 product.getPrice()
         );
@@ -47,8 +45,8 @@ public class ProductMapper {
         if (dto.gallery() != null) product.setGallery(dto.gallery());
         if (dto.model() != null) product.setModel(dto.model());
         if (dto.dimensions() != null) product.setDimensions(dto.dimensions());
-        if (dto.isVisible() != null) product.setVisible(dto.isVisible());
-        if (dto.isDeleted() != null) product.setDeleted(dto.isDeleted());
+        if (dto.visible() != null) product.setVisible(dto.visible());
+        if (dto.deleted() != null) product.setDeleted(dto.deleted());
     }
 
     public static ProductDTO toDTO(Product product) {
@@ -65,9 +63,9 @@ public class ProductMapper {
                 product.getTenantId(),
                 product.getGallery(),
                 product.getModel(),
-                product.getDimensions(),
+                product.isDeleted(),
                 product.isVisible(),
-                product.isDeleted()
-        );
+                product.getDimensions()
+                );
     }
 }

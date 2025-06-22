@@ -74,7 +74,7 @@ public class ProductRepositoryImpl implements IProductRepositoryCustom {
             predicates.add(cb.equal(root.get("tenantId"), criteria.tenantId()));
         }
 
-        predicates.add(cb.isFalse(root.get("isDeleted")));
+        predicates.add(cb.isFalse(root.get("deleted")));
 
         return predicates;
     }

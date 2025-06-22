@@ -7,4 +7,6 @@ import java.util.UUID;
 public interface IProductMetricService {
     ProductMetric getProductMetric(UUID productId);
     void incrementClickMetric(UUID productId);
+    void incrementArViewMetric(UUID productId);
+    void incrementSearchAppearMetric(UUID productId);
 }
