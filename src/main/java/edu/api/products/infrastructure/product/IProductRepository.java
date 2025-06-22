@@ -17,4 +17,5 @@ public interface IProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findAllByTenantIdAndDeletedFalse(UUID tenantId, Pageable pageable);
     Optional<Product> findByIdAndDeletedFalse(UUID productId);
     List<Product> findAllByIdInAndDeletedFalse(List<UUID> ids);
+    int countByTenantIdAndDeletedFalse(UUID tenantId);
 }

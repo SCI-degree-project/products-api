@@ -1,5 +1,6 @@
 package edu.api.products.application.controllers;
 
+import edu.api.products.application.dto.GeneralMetricsReport;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.metrics.ProductMetricService;
@@ -18,7 +19,7 @@ public class ProductMetricController {
 
     private final ProductMetricService productMetricService;
 
-    @GetMapping("/metrics/{productId}")
+    @GetMapping("/{productId}")
     public ResponseEntity<ProductMetric> getProductMetric(@PathVariable UUID productId) {
         try {
             ProductMetric metric = productMetricService.getProductMetric(productId);
@@ -32,7 +33,7 @@ public class ProductMetricController {
         }
     }
 
-    @PostMapping("/metrics/click/{productId}")
+    @PostMapping("/click/{productId}")
     public ResponseEntity<Void> registerClick(@PathVariable UUID productId) {
         try {
             productMetricService.incrementClickMetric(productId);
@@ -46,7 +47,7 @@ public class ProductMetricController {
         }
     }
 
-    @PostMapping("/metrics/ar-views/{productId}")
+    @PostMapping("/ar-views/{productId}")
     public ResponseEntity<Void> registerArView(@PathVariable UUID productId) {
         try {
             productMetricService.incrementArViewMetric(productId);
@@ -60,7 +61,7 @@ public class ProductMetricController {
         }
     }
 
-    @PostMapping("/metrics/search-appearances/{productId}")
+    @PostMapping("/search-appearances/{productId}")
     public ResponseEntity<Void> registerSearchAppearances(@PathVariable UUID productId) {
         try {
             productMetricService.incrementSearchAppearMetric(productId);
@@ -70,6 +71,20 @@ public class ProductMetricController {
         }catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/report/{tenantId}")
+    public ResponseEntity<GeneralMetricsReport> getTenantReport(@PathVariable UUID tenantId) {
+        try {
+            GeneralMetricsReport report = productMetricService.getTenantMetricsReport(tenantId);
+            return ResponseEntity.ok(report);
+        } catch (ProductNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
