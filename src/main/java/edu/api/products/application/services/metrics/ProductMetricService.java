@@ -1,13 +1,18 @@
 package edu.api.products.application.services.metrics;
 
+import edu.api.products.application.dto.GeneralMetricsReport;
+import edu.api.products.application.dto.ProductMetricSummary;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.ProductMetric;
 import edu.api.products.infrastructure.metrics.IProductMetricRepository;
 import edu.api.products.infrastructure.product.IProductRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -88,5 +93,33 @@ public class ProductMetricService implements IProductMetricService {
 
         metric.setSearchAppearances(metric.getSearchAppearances() + 1);
         productMetricRepository.save(metric);
+    }
+
+    public GeneralMetricsReport getTenantMetricsReport(UUID tenantId) {
+        int limit = 5;
+
+        List<ProductMetricSummary> mostClicked = productMetricRepository.findMostClickedProductsByTenant(tenantId, PageRequest.of(0, limit));
+        List<ProductMetricSummary> mostViewedAr = productMetricRepository.findMostViewedInArByTenant(tenantId, PageRequest.of(0, limit));
+        List<ProductMetricSummary> mostSearched = productMetricRepository.findMostSearchedByTenant(tenantId, PageRequest.of(0, limit));
+
+        Object[] row = (Object[]) productMetricRepository.getTotalAggregatesByTenant(tenantId)[0];
+        long totalClicks = row[0] != null ? (long) row[0] : 0;
+        long totalArViews = row[1] != null ? (long) row[1] : 0;
+        long totalSearches = row[2] != null ? (long) row[2] : 0;
+
+
+        int totalProducts = productRepository.countByTenantIdAndDeletedFalse(tenantId);
+
+        return GeneralMetricsReport.builder()
+                .tenantId(tenantId)
+                .period(YearMonth.now())
+                .totalClicks((int) totalClicks)
+                .totalArViews((int) totalArViews)
+                .totalSearchAppearances((int) totalSearches)
+                .totalProducts(totalProducts)
+                .mostClickedProducts(mostClicked)
+                .mostViewedInAr(mostViewedAr)
+                .mostSearchedProducts(mostSearched)
+                .build();
     }
 }
