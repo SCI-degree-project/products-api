@@ -8,7 +8,7 @@ import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
-import edu.api.products.application.services.product.ProductService;
+import edu.api.products.application.services.product.ProductServiceImpl;
 
 import edu.api.products.domain.Product;
 import jakarta.validation.Valid;
@@ -26,9 +26,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/v1/products")
 public class ProductController {
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceImpl productService) {
         this.productService = productService;
     }
 
@@ -124,7 +124,7 @@ public class ProductController {
     @PostMapping("/batch")
     public ResponseEntity<List<ProductPreviewDTO>> getProductsBatch(@RequestBody List<UUID> productIds) {
         try {
-            List<Product> products = productService.getProductsByIds(productIds);
+            List<Product> products = productService.getBatchProductsByIds(productIds);
             List<ProductPreviewDTO> previews = products.stream()
                     .map(ProductMapper::toPreview)
                     .toList();

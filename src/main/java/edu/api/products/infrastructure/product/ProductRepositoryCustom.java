@@ -5,6 +5,6 @@ import edu.api.products.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface IProductRepositoryCustom {
+public interface ProductRepositoryCustom {
     Page<Product> search(ProductSearchCriteria productSearchCriteria, Pageable pageable);
 }

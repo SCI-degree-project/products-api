@@ -3,7 +3,7 @@ package edu.api.products.application.controllers;
 import edu.api.products.application.dto.GeneralMetricsReport;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
-import edu.api.products.application.services.metrics.ProductMetricService;
+import edu.api.products.application.services.metrics.ProductMetricServiceImpl;
 import edu.api.products.domain.ProductMetric;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductMetricController {
 
-    private final ProductMetricService productMetricService;
+    private final ProductMetricServiceImpl productMetricService;
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductMetric> getProductMetric(@PathVariable UUID productId) {

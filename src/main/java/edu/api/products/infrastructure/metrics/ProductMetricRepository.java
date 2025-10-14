@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IProductMetricRepository extends JpaRepository<ProductMetric, UUID> {
+public interface ProductMetricRepository extends JpaRepository<ProductMetric, UUID> {
     Optional<ProductMetric> findByProductId(UUID productId);
     @Query("""
         SELECT new edu.api.products.application.dto.ProductMetricSummary(

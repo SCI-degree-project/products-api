@@ -6,10 +6,11 @@ import lombok.*;
 @Embeddable
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Dimensions {
-    private double width;
-    private double height;
-    private double depth;
+public class GalleryItem {
+    private String imageUrl;
+    private String altText;
+    private String aspectRatio;
 }

@@ -39,21 +39,11 @@ public class Product {
     @Column(nullable = false)
     private UUID tenantId;
 
-    @ElementCollection
-    @CollectionTable(name = "product_gallery", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image_url")
-    private List<String> gallery;
+    @Embedded
+    private Media media;
 
-    @Column(name = "model_url")
-    private String model;
-
-    @Column(nullable = false)
-    private boolean deleted = Boolean.FALSE;
-
-    private LocalDateTime deletedAt;
-
-    @Column(nullable = false)
-    private boolean visible = Boolean.TRUE;
+    @Embedded
+    private ProductStatus status;
 
     @Embedded
     private Dimensions dimensions;

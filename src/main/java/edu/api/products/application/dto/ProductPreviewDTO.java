@@ -8,5 +8,6 @@ public record ProductPreviewDTO(
         UUID id,
         String name,
         String cover,
-        double price
+        double price,
+        String aspectRatio
 ) { }
