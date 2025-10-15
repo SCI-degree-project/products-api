@@ -5,10 +5,23 @@ import edu.api.products.application.dto.ProductPreviewDTO;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.domain.Product;
 import edu.api.products.domain.ProductConstants;
+import edu.api.products.domain.ProductStatus;
+
+import java.time.LocalDateTime;
 
 public class ProductMapper {
     public static Product toEntity(ProductDTO dto) {
-        Product product = Product.builder().build();
+        ProductStatus status = new ProductStatus();
+        if (dto.status() != null) {
+            status = dto.status();
+        } else {
+            status = ProductStatus.builder()
+                    .createdAt(LocalDateTime.now())
+                    .deleted(false)
+                    .deletedAt(null)
+                    .visible(true)
+                    .build();
+        }
         return Product.builder()
                 .name(dto.name())
                 .description(dto.description())
@@ -17,6 +30,8 @@ public class ProductMapper {
                 .style(dto.style())
                 .tenantId(dto.tenantId())
                 .dimensions(dto.dimensions())
+                .media(dto.media())
+                .status(status)
                 .build();
     }
 
@@ -28,12 +43,20 @@ public class ProductMapper {
             cover = product.getMedia().getGallery().get(index).getImageUrl();
         }
 
+        String aspectRatio = null;
+        if(product.getMedia().getGallery() != null && !product.getMedia().getGallery().isEmpty()
+        && product.getMedia().getGallery().get(0) != null && product.getMedia().getGallery().get(0).getAspectRatio() != null) {
+            aspectRatio = product.getMedia().getGallery().get(0).getAspectRatio();
+        } else {
+            aspectRatio = "1.00";
+        }
+
         return new ProductPreviewDTO(
                 product.getId(),
                 product.getName() != null ? product.getName() : "No name",
                 cover,
                 product.getPrice(),
-                product.getMedia().getGallery().get(0).getAspectRatio()
+                aspectRatio
         );
     }
 
@@ -43,11 +66,18 @@ public class ProductMapper {
         if (dto.price() != null) product.setPrice(dto.price());
         if (dto.materials() != null) product.setMaterials(dto.materials());
         if (dto.style() != null) product.setStyle(dto.style());
-        if (dto.media().getGallery() != null) product.getMedia().setGallery(dto.media().getGallery());
-        if (dto.media().getModel() != null) product.getMedia().setModel(dto.media().getModel());
-        if (dto.dimensions() != null) product.setDimensions(dto.dimensions());
-        if (dto.status().getVisible() != null) product.getStatus().setVisible(dto.status().getVisible());
-        if (dto.status().getDeleted() != null) product.getStatus().setDeleted(dto.status().getDeleted());
+        if (dto.media() != null) {
+            if (dto.media().getGallery() != null) product.getMedia().setGallery(dto.media().getGallery());
+            if (dto.media().getModel() != null) product.getMedia().setModel(dto.media().getModel());
+        }
+        if(dto.dimensions() != null) {
+            if (dto.dimensions().getWidth() != null) product.getDimensions().setWidth(dto.dimensions().getWidth());
+            if (dto.dimensions().getHeight() != null) product.getDimensions().setHeight(dto.dimensions().getHeight());
+            if (dto.dimensions().getDepth() != null) product.getDimensions().setDepth(dto.dimensions().getDepth());
+        }
+        if (dto.status() != null) {
+            if (dto.status().visible() != null) product.getStatus().setVisible(dto.status().visible());
+        }
     }
 
     public static ProductDTO toDTO(Product product) {

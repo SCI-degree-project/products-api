@@ -87,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setStyle(product.style());
         existingProduct.getMedia().setGallery(product.media().getGallery());
         existingProduct.getMedia().setModel(product.media().getModel());
+        existingProduct.getStatus().setVisible(product.status().getVisible());
 
         validateProduct(existingProduct);
 
@@ -144,7 +145,10 @@ public class ProductServiceImpl implements ProductService {
 
         validateProduct(existingProduct);
 
-        calculateAspectRatio(existingProduct);
+        if (existingProduct.getMedia() != null && existingProduct.getMedia().getGallery() != null
+                && !existingProduct.getMedia().getGallery().isEmpty() && existingProduct.getMedia().getGallery().get(0) != null) {
+            calculateAspectRatio(existingProduct);
+        }
 
         return productRepository.save(existingProduct);
     }
@@ -178,14 +182,15 @@ public class ProductServiceImpl implements ProductService {
         return existingProduct;
     }
 
-    private void calculateAspectRatio(Product existingProduct) {
-        if (!existingProduct.getMedia().getGallery().get(0).getImageUrl().isEmpty() ||
-                !(existingProduct.getMedia().getGallery().get(0).getImageUrl() == null)) {
+    private void calculateAspectRatio(Product product) {
+        System.out.println(product.getMedia().getGallery().get(0).getImageUrl());
+        if (!product.getMedia().getGallery().get(0).getImageUrl().isEmpty() ||
+                product.getMedia().getGallery().get(0).getImageUrl() != null) {
             try {
-                String aspectRatio = imageService.calculateAspectRatio(existingProduct.getMedia().getGallery().get(0).getImageUrl());
-                existingProduct.getMedia().getGallery().get(0).setAspectRatio(aspectRatio);
+                String aspectRatio = imageService.calculateAspectRatio(product.getMedia().getGallery().get(0).getImageUrl());
+                product.getMedia().getGallery().get(0).setAspectRatio(aspectRatio);
             } catch (RuntimeException e) {
-                existingProduct.getMedia().getGallery().get(0).setAspectRatio("1.00");
+                product.getMedia().getGallery().get(0).setAspectRatio("1.00");
                 throw new RuntimeException("Could not calculate aspect ratio", e);
             }
         }

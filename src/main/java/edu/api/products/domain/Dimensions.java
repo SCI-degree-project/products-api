@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Dimensions {
-    private double width;
-    private double height;
-    private double depth;
+    private Double width;
+    private Double height;
+    private Double depth;
 }

@@ -11,6 +11,6 @@ public record UpdateProductDTO(
         List<Material> materials,
         Style style,
         Media media,
-        ProductStatus status,
+        UpdateProductStatusDTO status,
         Dimensions dimensions
 ) {}
