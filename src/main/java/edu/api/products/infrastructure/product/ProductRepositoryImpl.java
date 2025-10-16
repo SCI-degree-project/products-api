@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ProductRepositoryImpl implements IProductRepositoryCustom {
+public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;

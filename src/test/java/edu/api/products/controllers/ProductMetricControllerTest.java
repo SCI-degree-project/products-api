@@ -3,7 +3,7 @@ package edu.api.products.controllers;
 import edu.api.products.application.controllers.ProductMetricController;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
-import edu.api.products.application.services.metrics.ProductMetricService;
+import edu.api.products.application.services.metrics.ProductMetricServiceImpl;
 import edu.api.products.domain.ProductMetric;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,12 @@ import static org.mockito.Mockito.*;
 
 class ProductMetricControllerTest {
 
-    private ProductMetricService productMetricService;
+    private ProductMetricServiceImpl productMetricService;
     private ProductMetricController controller;
 
     @BeforeEach
     void setUp() {
-        productMetricService = mock(ProductMetricService.class);
+        productMetricService = mock(ProductMetricServiceImpl.class);
         controller = new ProductMetricController(productMetricService);
     }
 

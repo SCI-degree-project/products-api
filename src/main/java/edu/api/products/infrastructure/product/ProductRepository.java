@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface IProductRepository extends JpaRepository<Product, UUID> {
+public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findAllByTenantId(UUID tenantId, Pageable pageable);
     void deleteByTenantId(UUID tenantId);
     List<Product> findAllByIdIn(List<UUID> ids);
 
-    Page<Product> findAllByTenantIdAndDeletedFalse(UUID tenantId, Pageable pageable);
-    Optional<Product> findByIdAndDeletedFalse(UUID productId);
-    List<Product> findAllByIdInAndDeletedFalse(List<UUID> ids);
-    int countByTenantIdAndDeletedFalse(UUID tenantId);
+    Page<Product> findAllByTenantIdAndStatus_DeletedFalse(UUID tenantId, Pageable pageable);
+    Optional<Product> findByIdAndStatus_DeletedFalse(UUID productId);
+    List<Product> findAllByIdInAndStatus_DeletedFalse(List<UUID> ids);
+    int countByTenantIdAndStatus_DeletedFalse(UUID tenantId);
 }

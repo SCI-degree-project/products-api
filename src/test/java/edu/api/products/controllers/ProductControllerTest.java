@@ -3,7 +3,7 @@ package edu.api.products.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
-import edu.api.products.application.services.product.ProductService;
+import edu.api.products.application.services.product.ProductServiceImpl;
 import edu.api.products.domain.Dimensions;
 import edu.api.products.domain.Material;
 import edu.api.products.domain.Product;
@@ -34,7 +34,7 @@ public class ProductControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

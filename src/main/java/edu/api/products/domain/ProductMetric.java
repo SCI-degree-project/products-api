@@ -22,6 +22,9 @@ public class ProductMetric {
     @Column(name = "product_id", nullable = false)
     private UUID productId;
 
+    @Column(name = "score")
+    private double score;
+
     @Column(name = "clicks")
     private int clicks;
 
