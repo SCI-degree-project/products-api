@@ -3,9 +3,9 @@ package edu.api.products.application.mappers;
 import edu.api.products.application.dto.ProductDTO;
 import edu.api.products.application.dto.ProductPreviewDTO;
 import edu.api.products.application.dto.UpdateProductDTO;
-import edu.api.products.domain.Product;
+import edu.api.products.domain.product.Product;
 import edu.api.products.domain.ProductConstants;
-import edu.api.products.domain.ProductStatus;
+import edu.api.products.domain.product.ProductStatus;
 
 import java.time.LocalDateTime;
 

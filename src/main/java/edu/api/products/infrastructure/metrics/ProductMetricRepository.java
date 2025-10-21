@@ -1,7 +1,7 @@
 package edu.api.products.infrastructure.metrics;
 
 import edu.api.products.application.dto.ProductMetricSummary;
-import edu.api.products.domain.ProductMetric;
+import edu.api.products.domain.metric.ProductMetric;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,9 +16,14 @@ public interface ProductMetricRepository extends JpaRepository<ProductMetric, UU
     @Query("""
         SELECT new edu.api.products.application.dto.ProductMetricSummary(
             p.id, p.name,
+            COALESCE(m.rawScore, 0.0),
+            COALESCE(m.normalizedScore, 0.0),
             COALESCE(m.clicks, 0),
             COALESCE(m.arViews, 0),
-            COALESCE(m.searchAppearances, 0)
+            COALESCE(m.searchAppearances, 0),
+            COALESCE(m.favoritesAdds, 0),
+            COALESCE(m.timeSpentOnProductPageSeconds, 0.0),
+            COALESCE(m.timeSpentOnArViewSeconds, 0.0)
         )
         FROM ProductMetric m
         JOIN Product p ON m.productId = p.id
@@ -30,9 +35,15 @@ public interface ProductMetricRepository extends JpaRepository<ProductMetric, UU
     @Query("""
         SELECT new edu.api.products.application.dto.ProductMetricSummary(
             p.id, p.name,
+            COALESCE(m.rawScore, 0.0),
+            COALESCE(m.normalizedScore, 0.0),
             COALESCE(m.clicks, 0),
             COALESCE(m.arViews, 0),
-            COALESCE(m.searchAppearances, 0)
+            COALESCE(m.searchAppearances, 0),
+            COALESCE(m.favoritesAdds, 0),
+            COALESCE(m.timeSpentOnProductPageSeconds, 0.0),
+            COALESCE(m.timeSpentOnArViewSeconds, 0.0)
+            
         )
         FROM ProductMetric m
         JOIN Product p ON m.productId = p.id
@@ -44,9 +55,14 @@ public interface ProductMetricRepository extends JpaRepository<ProductMetric, UU
     @Query("""
         SELECT new edu.api.products.application.dto.ProductMetricSummary(
             p.id, p.name,
+            COALESCE(m.rawScore, 0.0),
+            COALESCE(m.normalizedScore, 0.0),
             COALESCE(m.clicks, 0),
             COALESCE(m.arViews, 0),
-            COALESCE(m.searchAppearances, 0)
+            COALESCE(m.searchAppearances, 0),
+            COALESCE(m.favoritesAdds, 0),
+            COALESCE(m.timeSpentOnProductPageSeconds, 0.0),
+            COALESCE(m.timeSpentOnArViewSeconds, 0.0)
         )
         FROM ProductMetric m
         JOIN Product p ON m.productId = p.id
@@ -56,7 +72,13 @@ public interface ProductMetricRepository extends JpaRepository<ProductMetric, UU
     List<ProductMetricSummary> findMostSearchedByTenant(@Param("tenantId") UUID tenantId, Pageable pageable);
 
     @Query("""
-        SELECT SUM(m.clicks), SUM(m.arViews), SUM(m.searchAppearances)
+        SELECT 
+            SUM(m.clicks), 
+            SUM(m.arViews), 
+            SUM(m.searchAppearances),
+            SUM(m.favoritesAdds),
+            SUM(m.timeSpentOnProductPageSeconds),
+            SUM(m.timeSpentOnArViewSeconds)
         FROM ProductMetric m
         JOIN Product p ON m.productId = p.id
         WHERE p.tenantId = :tenantId

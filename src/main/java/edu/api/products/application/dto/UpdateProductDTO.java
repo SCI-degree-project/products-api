@@ -1,6 +1,9 @@
 package edu.api.products.application.dto;
 
-import edu.api.products.domain.*;
+import edu.api.products.domain.product.Dimensions;
+import edu.api.products.domain.product.Material;
+import edu.api.products.domain.product.Media;
+import edu.api.products.domain.product.Style;
 
 import java.util.List;
 

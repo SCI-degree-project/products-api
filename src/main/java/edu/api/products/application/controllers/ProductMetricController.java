@@ -4,7 +4,9 @@ import edu.api.products.application.dto.GeneralMetricsReport;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.metrics.ProductMetricServiceImpl;
-import edu.api.products.domain.ProductMetric;
+import edu.api.products.domain.metric.MetricType;
+import edu.api.products.domain.metric.ProductMetric;
+import edu.api.products.domain.metric.TimeMetricType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +35,19 @@ public class ProductMetricController {
         }
     }
 
-    @PostMapping("/click/{productId}")
-    public ResponseEntity<Void> registerClick(@PathVariable UUID productId) {
+    @PostMapping("/register/{productId}")
+    public ResponseEntity<Void> registerMetric(@PathVariable UUID productId, @RequestBody MetricType metric) {
         try {
-            productMetricService.incrementClickMetric(productId);
-            return ResponseEntity.ok().build();
+            switch (metric) {
+                case CLICK -> productMetricService.incrementClickMetric(productId);
+                case AR_VIEW -> productMetricService.incrementArViewMetric(productId);
+                case SEARCH_APPEARANCE -> productMetricService.incrementSearchAppearMetric(productId);
+                case FAVORITE_ADD -> productMetricService.incrementFavoritesAdds(productId);
+                default -> {
+                    return ResponseEntity.badRequest().build();
+                }
+            }
+            return ResponseEntity.status(HttpStatus.OK).build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
         }catch (BusinessException e) {
@@ -47,25 +57,17 @@ public class ProductMetricController {
         }
     }
 
-    @PostMapping("/ar-views/{productId}")
-    public ResponseEntity<Void> registerArView(@PathVariable UUID productId) {
+    @PostMapping("/register-time/{productId}")
+    public ResponseEntity<Void> registerTimeMetric(@PathVariable UUID productId, @RequestBody TimeMetricType metric, @RequestBody float duration) {
         try {
-            productMetricService.incrementArViewMetric(productId);
-            return ResponseEntity.ok().build();
-        } catch (ProductNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }catch (BusinessException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PostMapping("/search-appearances/{productId}")
-    public ResponseEntity<Void> registerSearchAppearances(@PathVariable UUID productId) {
-        try {
-            productMetricService.incrementSearchAppearMetric(productId);
-            return ResponseEntity.ok().build();
+            switch (metric) {
+                case TIME_ON_PAGE -> productMetricService.registerTimeOnPage(productId, duration);
+                case TIME_ON_AR -> productMetricService.registerTimeInAr(productId, duration);
+                default -> {
+                    return ResponseEntity.badRequest().build();
+                }
+            }
+            return ResponseEntity.status(HttpStatus.OK).build();
         } catch (ProductNotFoundException e) {
             return ResponseEntity.notFound().build();
         }catch (BusinessException e) {

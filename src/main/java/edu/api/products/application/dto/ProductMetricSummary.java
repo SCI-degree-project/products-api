@@ -1,20 +1,20 @@
 package edu.api.products.application.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ProductMetricSummary {
-    private UUID productId;
-    private String name;
-    private int clicks;
-    private int arViews;
-    private int searchAppearances;
+public record ProductMetricSummary(
+        UUID productId,
+        String productName,
+        double rawScore,
+        double normalizedScore,
+        int clicks,
+        int arViews,
+        int searchAppearances,
+        int favoritesAdds,
+        float timeSpentOnProductPageSeconds,
+        float timeSpentOnArViewSeconds
+) {
 }

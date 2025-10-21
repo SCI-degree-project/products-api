@@ -1,7 +1,7 @@
 package edu.api.products.infrastructure.product;
 
 import edu.api.products.application.dto.ProductSearchCriteria;
-import edu.api.products.domain.Product;
+import edu.api.products.domain.product.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;

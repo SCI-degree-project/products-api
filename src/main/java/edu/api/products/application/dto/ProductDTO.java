@@ -1,6 +1,6 @@
 package edu.api.products.application.dto;
 
-import edu.api.products.domain.*;
+import edu.api.products.domain.product.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

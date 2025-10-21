@@ -8,16 +8,17 @@ import edu.api.products.application.exceptions.InvalidTenantException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.mappers.ProductMapper;
 import edu.api.products.application.services.image.ImageService;
-import edu.api.products.domain.Product;
+import edu.api.products.domain.product.Material;
+import edu.api.products.domain.product.Product;
 import edu.api.products.domain.ProductConstants;
-import edu.api.products.domain.ProductMetric;
+import edu.api.products.domain.metric.ProductMetric;
+import edu.api.products.domain.product.Style;
 import edu.api.products.infrastructure.product.ProductRepository;
 import edu.api.products.infrastructure.product.ProductRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -159,6 +160,22 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Search criteria must not be null.");
         }
         return productRepositoryCustom.search(criteria, pageable);
+    }
+
+    @Override
+    public Page<Product> getProductsByMaterial(UUID tenantId, Material material, Pageable pageable) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
+        }
+        return productRepository.findAllByTenantIdAndMaterial(tenantId, material, pageable);
+    }
+
+    @Override
+    public Page<Product> getProductsByStyle(UUID tenantId, Style style, Pageable pageable) {
+        if (tenantId == null) {
+            throw new BusinessException("Tenant Id must not be null.");
+        }
+        return productRepository.findAllByTenantIdAndStyle(tenantId, style, pageable);
     }
 
     private void validateProduct(Product product) {

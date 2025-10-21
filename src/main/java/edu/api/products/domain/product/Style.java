@@ -1,4 +1,4 @@
-package edu.api.products.domain;
+package edu.api.products.domain.product;
 
 public enum Style {
     MODERN,

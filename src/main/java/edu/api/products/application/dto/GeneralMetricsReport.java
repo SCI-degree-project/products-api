@@ -21,6 +21,7 @@ public class GeneralMetricsReport {
     private int totalClicks;
     private int totalArViews;
     private int totalSearchAppearances;
+    private int totalFavoriteAdds;
     private int totalProducts;
 
     private List<ProductMetricSummary> mostClickedProducts;
