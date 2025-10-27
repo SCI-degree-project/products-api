@@ -70,7 +70,7 @@ public class ProductMetricServiceImpl implements ProductMetricService {
     @Transactional
     public void registerTimeOnPage(UUID productId, float durationSeconds) {
         ProductMetric metric = getOrCreateMetric(productId);
-        float newTotal = metric.getTimeSpentOnProductPageSeconds() + durationSeconds;
+        float newTotal = (metric.getTimeSpentOnProductPageSeconds() + durationSeconds)/2;
         metric.setTimeSpentOnProductPageSeconds(newTotal);
         productMetricRepository.save(metric);
     }
@@ -79,7 +79,7 @@ public class ProductMetricServiceImpl implements ProductMetricService {
     @Transactional
     public void registerTimeInAr(UUID productId, float durationSeconds) {
         ProductMetric metric = getOrCreateMetric(productId);
-        float newTotal = metric.getTimeSpentOnArViewSeconds() + durationSeconds;
+        float newTotal = (metric.getTimeSpentOnArViewSeconds() + durationSeconds)/2;
         metric.setTimeSpentOnArViewSeconds(newTotal);
         productMetricRepository.save(metric);
     }

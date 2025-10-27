@@ -24,4 +24,5 @@ public interface ProductService {
     Page<Product> search(ProductSearchCriteria criteria, Pageable pageable);
     Page<Product> getProductsByMaterial(UUID tenantId, Material material, Pageable pageable);
     Page<Product> getProductsByStyle(UUID tenantId, Style style, Pageable pageable);
+    Page<Product> getScoredProducts(Pageable pageable);
 }

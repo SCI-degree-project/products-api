@@ -1,6 +1,7 @@
 package edu.api.products.application.services.product;
 
 import edu.api.products.application.dto.ProductDTO;
+import edu.api.products.application.dto.ProductPreviewDTO;
 import edu.api.products.application.dto.ProductSearchCriteria;
 import edu.api.products.application.dto.UpdateProductDTO;
 import edu.api.products.application.exceptions.BusinessException;
@@ -16,10 +17,13 @@ import edu.api.products.domain.product.Style;
 import edu.api.products.infrastructure.product.ProductRepository;
 import edu.api.products.infrastructure.product.ProductRepositoryCustom;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -176,6 +180,14 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Tenant Id must not be null.");
         }
         return productRepository.findAllByTenantIdAndStyle(tenantId, style, pageable);
+    }
+
+    @Override
+    public Page<Product> getScoredProducts(Pageable pageable) {
+        Page<Product> page = productRepository.findAllByScore(pageable);
+        List<Product> products = new ArrayList<>(page.getContent());
+        Collections.shuffle(products);
+        return new PageImpl<>(products, pageable, page.getTotalElements());
     }
 
     private void validateProduct(Product product) {

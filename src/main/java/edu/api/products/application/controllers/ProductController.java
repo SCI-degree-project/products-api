@@ -195,10 +195,10 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{tenantId}/products/material")
+    @GetMapping("/{tenantId}/material")
     public ResponseEntity<Page<ProductPreviewDTO>> getProductsByMaterial(
             @PathVariable UUID tenantId,
-            @RequestBody Material material,
+            @RequestParam Material material,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
@@ -215,10 +215,10 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{tenantId}/products/style")
+    @GetMapping("/{tenantId}/style")
     public ResponseEntity<Page<ProductPreviewDTO>> getProductsByStyle(
             @PathVariable UUID tenantId,
-            @RequestBody Style style,
+            @RequestParam Style style,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
@@ -230,6 +230,20 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }catch (BusinessException e) {
             return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/scored")
+    public ResponseEntity<Page<ProductPreviewDTO>> getScoredProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "m.normalized_score"));
+            Page<Product> products = productService.getScoredProducts(pageable);
+            return ResponseEntity.ok(products.map(ProductMapper::toPreview));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

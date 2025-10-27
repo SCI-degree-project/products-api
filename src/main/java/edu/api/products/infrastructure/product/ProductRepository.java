@@ -51,4 +51,21 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             @Param("style") Style style,
             Pageable pageable
     );
+
+    @Query(value = """
+    SELECT p.*
+    FROM products p
+    LEFT JOIN product_metrics m ON p.product_id = m.product_id
+    WHERE m.normalized_score >= 0.4
+      AND p.deleted = FALSE
+      AND p.tenant_id IN (
+          SELECT DISTINCT tenant_id
+          FROM products
+          GROUP BY tenant_id
+          LIMIT 20
+      )
+    """, nativeQuery = true)
+    Page<Product> findAllByScore(
+            Pageable pageable
+    );
 }

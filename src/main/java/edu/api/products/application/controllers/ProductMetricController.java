@@ -1,6 +1,8 @@
 package edu.api.products.application.controllers;
 
 import edu.api.products.application.dto.GeneralMetricsReport;
+import edu.api.products.application.dto.RegisterMetricDTO;
+import edu.api.products.application.dto.RegisterTimeMetricDTO;
 import edu.api.products.application.exceptions.BusinessException;
 import edu.api.products.application.exceptions.ProductNotFoundException;
 import edu.api.products.application.services.metrics.ProductMetricServiceImpl;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,8 +39,9 @@ public class ProductMetricController {
     }
 
     @PostMapping("/register/{productId}")
-    public ResponseEntity<Void> registerMetric(@PathVariable UUID productId, @RequestBody MetricType metric) {
+    public ResponseEntity<Void> registerMetric(@PathVariable UUID productId, @RequestBody RegisterMetricDTO registerTimeMetricDTO) {
         try {
+            MetricType metric = registerTimeMetricDTO.metric();
             switch (metric) {
                 case CLICK -> productMetricService.incrementClickMetric(productId);
                 case AR_VIEW -> productMetricService.incrementArViewMetric(productId);
@@ -58,8 +62,11 @@ public class ProductMetricController {
     }
 
     @PostMapping("/register-time/{productId}")
-    public ResponseEntity<Void> registerTimeMetric(@PathVariable UUID productId, @RequestBody TimeMetricType metric, @RequestBody float duration) {
+    public ResponseEntity<Void> registerTimeMetric(@PathVariable UUID productId, @RequestBody RegisterTimeMetricDTO registerTimeMetricDTO) {
         try {
+            TimeMetricType metric = registerTimeMetricDTO.metric();
+            float duration = registerTimeMetricDTO.duration();
+
             switch (metric) {
                 case TIME_ON_PAGE -> productMetricService.registerTimeOnPage(productId, duration);
                 case TIME_ON_AR -> productMetricService.registerTimeInAr(productId, duration);
