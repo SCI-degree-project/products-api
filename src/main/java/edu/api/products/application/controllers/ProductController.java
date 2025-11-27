@@ -166,6 +166,10 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int size
     ) {
         try {
+            if (criteria == null) {
+                throw new BusinessException("Search criteria must not be null.");
+            }
+
             List<String> allowedSortBy = List.of("name", "price");
             List<String> allowedDirections = List.of("asc", "desc");
 

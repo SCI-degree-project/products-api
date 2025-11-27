@@ -12,7 +12,5 @@ public record ProductSearchCriteria(
         List<Material> materials,
         String sortBy,
         String direction,
-        int page,
-        int size,
         UUID tenantId
 ) { }
